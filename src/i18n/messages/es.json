@@ -1,0 +1,108 @@
+{
+  "Brand": {
+    "name": "Shadow Games",
+    "tagline": "Donde la penumbra cobra vida.",
+    "manifesto": "Mundos con sombra, hechos a mano."
+  },
+  "Nav": {
+    "home": "Inicio",
+    "games": "Juegos",
+    "studio": "Estudio",
+    "press": "Press",
+    "contact": "Contacto",
+    "discord": "Discord"
+  },
+  "Hero": {
+    "ctaGames": "Ver juegos",
+    "ctaTrailer": "Ver tráiler",
+    "trailerComingSoon": "Tráiler próximamente"
+  },
+  "Home": {
+    "gamesTitle": "Nuestros juegos",
+    "gamesSubtitle": "Mundos para perderse",
+    "gamesViewAll": "Ver todos los juegos",
+    "studioTitle": "El estudio",
+    "studioBody": "Shadow Games es un estudio indie que construye mundos cinematográficos hechos a mano. Cada proyecto nace de una obsesión por la atmósfera, el detalle y la sombra como protagonista. Diseñamos juegos para quedarse, no solo para jugarse.",
+    "studioCta": "Conoce al estudio",
+    "merchTitle": "Shadow Stuff",
+    "merchSubtitle": "Próximamente",
+    "merchBody": "Posters, vinilos, art books y rarezas. Pronto.",
+    "communityTitle": "Únete a la comunidad",
+    "communityBody": "Discord activo, novedades primero, betas y arte exclusivo.",
+    "communityCtaDiscord": "Entrar al Discord",
+    "communityCtaFollow": "Síguenos"
+  },
+  "Games": {
+    "filterStatus": "Estado",
+    "filterGenre": "Género",
+    "filterAll": "Todos",
+    "empty": "No hay juegos que coincidan con esos filtros.",
+    "platforms": "Plataformas",
+    "year": "Año",
+    "genres": "Géneros",
+    "trailer": "Tráiler",
+    "screenshots": "Capturas",
+    "buyOn": "Conseguir en",
+    "moreInfo": "Más información",
+    "nextGame": "Siguiente juego",
+    "prevGame": "Juego anterior"
+  },
+  "Status": {
+    "released": "Disponible",
+    "early-access": "Early Access",
+    "in-development": "En desarrollo",
+    "coming-soon": "Próximamente"
+  },
+  "Studio": {
+    "title": "El estudio",
+    "subtitle": "Mundos con sombra, hechos a mano",
+    "comingSoon": "Bio en construcción. Pronto."
+  },
+  "Press": {
+    "title": "Press kit",
+    "subtitle": "Para periodistas, creadores y curadores",
+    "downloadAll": "Descargar todo (.zip)",
+    "factSheetTitle": "Ficha del estudio",
+    "logosTitle": "Logos",
+    "screenshotsTitle": "Capturas y key art",
+    "contactTitle": "Contacto de prensa"
+  },
+  "Contact": {
+    "title": "Contacto",
+    "subtitle": "¿Tienes algo que decirnos?",
+    "name": "Nombre",
+    "email": "Email",
+    "subject": "Asunto",
+    "message": "Mensaje",
+    "send": "Enviar mensaje",
+    "sending": "Enviando…",
+    "successTitle": "Mensaje enviado",
+    "successBody": "Te respondemos pronto.",
+    "errorTitle": "Algo salió mal",
+    "errorBody": "Inténtalo de nuevo o escríbenos directamente."
+  },
+  "Theme": {
+    "toggle": "Cambiar tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "Footer": {
+    "rights": "Todos los derechos reservados",
+    "privacy": "Privacidad",
+    "legal": "Aviso legal",
+    "madeWith": "Hecho con sombra desde",
+    "language": "Idioma"
+  },
+  "NotFound": {
+    "code": "404",
+    "title": "Te perdiste en la penumbra",
+    "body": "La página que buscas no existe o se fue al otro lado.",
+    "cta": "Volver al inicio"
+  },
+  "Error": {
+    "title": "Algo se rompió en la oscuridad",
+    "body": "Un error inesperado. Inténtalo de nuevo en un momento.",
+    "retry": "Reintentar"
+  }
+}

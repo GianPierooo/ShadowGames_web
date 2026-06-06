@@ -1,0 +1,58 @@
+import { cva, type VariantProps } from "class-variance-authority";
+import { Slot } from "@radix-ui/react-slot";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { cn } from "@/lib/cn";
+
+const buttonVariants = cva(
+  [
+    "inline-flex items-center justify-center gap-2",
+    "font-sans font-medium whitespace-nowrap",
+    "transition-colors duration-200",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",
+    "disabled:pointer-events-none disabled:opacity-50",
+    "cursor-pointer select-none",
+  ].join(" "),
+  {
+    variants: {
+      variant: {
+        solid:
+          "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] shadow-[var(--shadow-glow)]",
+        outline:
+          "border border-[var(--accent)]/40 text-[var(--text)] hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]",
+        ghost: "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--accent-soft)]",
+        pill:
+          "border border-[var(--border)] bg-[var(--surface)]/60 text-[var(--text)] backdrop-blur hover:border-[var(--accent)]/60 hover:bg-[var(--surface)]",
+      },
+      size: {
+        sm: "h-9 px-4 text-sm rounded-[var(--radius-pill)]",
+        md: "h-11 px-6 text-base rounded-[var(--radius-pill)]",
+        lg: "h-13 px-8 text-lg rounded-[var(--radius-pill)]",
+        icon: "size-10 rounded-full",
+      },
+    },
+    defaultVariants: {
+      variant: "solid",
+      size: "md",
+    },
+  },
+);
+
+export interface ButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { className, variant, size, asChild = false, ...props },
+  ref,
+) {
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      ref={ref}
+      className={cn(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
+});
