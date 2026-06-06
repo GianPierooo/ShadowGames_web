@@ -162,6 +162,94 @@ a:focus-visible {
   }
 }
 
+/* ===== Hero: gradient mesh animado ===== */
+.mesh-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
+  pointer-events: none;
+}
+
+@keyframes mesh-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(7%, 5%, 0) scale(1.18);
+  }
+}
+
+@keyframes mesh-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate3d(-6%, -7%, 0) scale(0.92);
+  }
+}
+
+@keyframes mesh-drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(5%, -6%, 0) scale(1.22);
+  }
+}
+
+.mesh-a {
+  animation: mesh-drift-a 22s ease-in-out infinite;
+}
+.mesh-b {
+  animation: mesh-drift-b 26s ease-in-out infinite;
+}
+.mesh-c {
+  animation: mesh-drift-c 30s ease-in-out infinite;
+}
+
+/* ===== Partículas flotantes ===== */
+@keyframes float-particle {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-26px);
+    opacity: 0.85;
+  }
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--accent);
+  filter: blur(1px);
+  will-change: transform, opacity;
+  animation: float-particle var(--p-dur, 7s) ease-in-out var(--p-delay, 0s) infinite;
+}
+
+/* ===== Scroll hint ===== */
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+.scroll-hint {
+  animation: scroll-hint 2.2s ease-in-out infinite;
+}
+
 /* ===== Grano cinematográfico ===== */
 .grain {
   position: relative;

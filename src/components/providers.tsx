@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeProvider as NextThemeProvider } from "next-themes";
+import { MotionConfig } from "motion/react";
 import { Toaster } from "sonner";
 import type { ReactNode } from "react";
 
@@ -11,6 +12,9 @@ interface ProvidersProps {
 /**
  * Providers globales del cliente.
  * - next-themes con dark por defecto y respeto de prefers-color-scheme
+ * - MotionConfig reducedMotion="user": respeta prefers-reduced-motion del SO
+ *   desactivando transform/layout pero conservando fades de opacidad. Clave:
+ *   evita ramificar el JSX por reduced-motion (eso provoca hydration mismatch).
  * - Sonner para toasts (notificaciones de forms, etc.)
  */
 export function Providers({ children }: ProvidersProps) {
@@ -22,7 +26,7 @@ export function Providers({ children }: ProvidersProps) {
       disableTransitionOnChange
       themes={["light", "dark"]}
     >
-      {children}
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
       <Toaster
         position="bottom-right"
         theme="dark"

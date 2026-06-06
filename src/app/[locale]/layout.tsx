@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter_Tight } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Providers } from "@/components/providers";
+import { Header } from "@/components/site/header";
+import { Footer } from "@/components/site/footer";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -82,11 +85,18 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     notFound();
   }
 
+  // Habilita renderizado estático para esta locale (next-intl).
+  setRequestLocale(locale);
+
   return (
     <html lang={locale} suppressHydrationWarning className={`${fraunces.variable} ${interTight.variable}`}>
       <body>
         <NextIntlClientProvider>
-          <Providers>{children}</Providers>
+          <Providers>
+            <Header />
+            <main id="contenido">{children}</main>
+            <Footer />
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>
