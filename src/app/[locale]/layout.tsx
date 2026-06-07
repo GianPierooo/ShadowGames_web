@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter_Tight } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/site/header";
@@ -87,12 +87,19 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   // Habilita renderizado estático para esta locale (next-intl).
   setRequestLocale(locale);
+  const t = await getTranslations("A11y");
 
   return (
     <html lang={locale} suppressHydrationWarning className={`${fraunces.variable} ${interTight.variable}`}>
       <body>
         <NextIntlClientProvider>
           <Providers>
+            <a
+              href="#contenido"
+              className="sr-only rounded-[var(--radius-pill)] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-[var(--accent-deep)] focus:px-5 focus:py-3 focus:font-medium focus:text-white focus:shadow-[var(--shadow-card)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            >
+              {t("skipToContent")}
+            </a>
             <Header />
             <main id="contenido">{children}</main>
             <Footer />

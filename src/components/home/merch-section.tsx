@@ -22,7 +22,7 @@ export async function MerchSection() {
         <Reveal>
           <header className="mb-12 flex flex-col items-center gap-3 text-center md:mb-16">
             <p className="text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
-              {t("merchTitle")}
+              {t("merchEyebrow")}
             </p>
             <h2
               id="merch-heading"

@@ -1,4 +1,7 @@
 {
+  "A11y": {
+    "skipToContent": "Saltar al contenido"
+  },
   "Brand": {
     "name": "Shadow Games",
     "tagline": "Donde la penumbra cobra vida.",
@@ -22,6 +25,8 @@
     "gamesSubtitle": "Mundos para perderse",
     "gamesViewAll": "Ver todos los juegos",
     "studioTitle": "El estudio",
+    "studioEyebrow": "Quiénes somos",
+    "merchEyebrow": "La tienda",
     "studioBody": "Shadow Games es un estudio indie que construye mundos cinematográficos hechos a mano. Cada proyecto nace de una obsesión por la atmósfera, el detalle y la sombra como protagonista. Diseñamos juegos para quedarse, no solo para jugarse.",
     "studioCta": "Conoce al estudio",
     "merchTitle": "Shadow Stuff",

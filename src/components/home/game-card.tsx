@@ -85,7 +85,7 @@ export function GameCard({ game, statusLabel, className }: GameCardProps) {
         >
           {game.tagline.es}
         </p>
-        <p className="mt-2 text-xs uppercase tracking-wider text-white/50">
+        <p className="mt-2 text-xs uppercase tracking-wider text-white/70">
           {game.year} · {game.genres[0]}
         </p>
       </div>

@@ -20,7 +20,7 @@ export async function StudioSection() {
         <Reveal>
           <div className="flex flex-col gap-6">
             <p className="text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
-              {t("studioTitle")}
+              {t("studioEyebrow")}
             </p>
             <h2
               id="studio-heading"

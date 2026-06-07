@@ -15,8 +15,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // CTA: fondo violeta deep (--accent-deep = #6d4ad6 dark / #4d2faa light)
+        // → texto blanco a 5.8:1+ (AA). El "pop" viene de glow + peso + brillo en
+        // hover, manteniendo la marca violeta (sin color de acción cálido).
         solid:
-          "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] shadow-[var(--shadow-glow)]",
+          "bg-[var(--accent-deep)] text-white font-semibold shadow-[var(--shadow-glow)] hover:brightness-110 hover:shadow-[0_0_70px_-6px_var(--accent)]",
         outline:
           "border border-[var(--accent)]/40 text-[var(--text)] hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]",
         ghost: "text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--accent-soft)]",
@@ -27,7 +30,7 @@ const buttonVariants = cva(
         sm: "h-9 px-4 text-sm rounded-[var(--radius-pill)]",
         md: "h-11 px-6 text-base rounded-[var(--radius-pill)]",
         lg: "h-13 px-8 text-lg rounded-[var(--radius-pill)]",
-        icon: "size-10 rounded-full",
+        icon: "size-11 rounded-full", /* 44×44px — touch target mínimo */
       },
     },
     defaultVariants: {

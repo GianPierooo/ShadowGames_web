@@ -65,7 +65,9 @@
   --surface-2: #ecebe5;
   --text: #181534;
   --text-muted: #4a476a;
-  --text-subtle: #7a779a;
+  /* En claro, subtle se oscurece para pasar AA (4.5:1) sobre crema.
+     #5a5878 ≈ 6:1 vs cream. (El #7a779a del tema oscuro daría 3.5:1 → falla.) */
+  --text-subtle: #5a5878;
   --border: rgba(24, 21, 52, 0.12);
 
   /* En claro usamos #6D4AD6 para texto/CTAs (contraste AA sobre crema) */
@@ -83,7 +85,16 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth; /* anclas suaves; se desactiva en reduced-motion (abajo) */
 }
+
+/* ===========================================================================
+ * Escala z-index (documentada — evita choques de stacking context)
+ *   10  contenido / overlays internos (hero content, badges, degradados card)
+ *   40  header flotante
+ *   50  overlays (Dialog: overlay + content — modal de tráiler, menú móvil)
+ *   60  skip-link al enfocar
+ * =========================================================================== */
 
 body {
   background: var(--bg);

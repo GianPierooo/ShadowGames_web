@@ -19,7 +19,9 @@ export function BrandMark({ withWordmark = true, size = 34, className }: BrandMa
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <Image
         src="/brand/logo.svg"
-        alt="Shadow Games"
+        /* Decorativo cuando el wordmark de texto está presente (evita anuncio
+           duplicado en lectores de pantalla); con significado si va solo. */
+        alt={withWordmark ? "" : "Shadow Games"}
         width={size}
         height={size}
         priority

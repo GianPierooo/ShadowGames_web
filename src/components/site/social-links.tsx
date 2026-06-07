@@ -42,7 +42,7 @@ export function SocialLinks({
               aria-label={SOCIAL_LABELS[key]}
               title={SOCIAL_LABELS[key]}
               className={cn(
-                "grid size-10 cursor-pointer place-items-center rounded-full",
+                "grid size-11 cursor-pointer place-items-center rounded-full",
                 "border border-[var(--border)] bg-[var(--surface)]/50 text-[var(--text-muted)]",
                 "transition-colors duration-200 hover:border-[var(--accent)]/60 hover:text-[var(--accent)]",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",

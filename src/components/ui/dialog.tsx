@@ -59,7 +59,7 @@ export const DialogContent = forwardRef<
         {!hideClose && (
           <DialogPrimitive.Close
             className={cn(
-              "absolute right-4 top-4 z-10 grid size-9 place-items-center rounded-full",
+              "absolute right-4 top-4 z-10 grid size-10 place-items-center rounded-full",
               "border border-[var(--border)] bg-[var(--bg)]/60 text-[var(--text-muted)]",
               "transition-colors hover:text-[var(--text)] hover:border-[var(--accent)]/60",
               "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",

@@ -2,17 +2,11 @@
 
 import { motion, type Variants } from "motion/react";
 import { useTranslations } from "next-intl";
-import { Play, ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { HeroBackdrop } from "@/components/home/hero-backdrop";
+import { TrailerDialog } from "@/components/home/trailer-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 
 const EASE = [0.21, 0.47, 0.32, 0.98] as const;
 
@@ -80,32 +74,7 @@ export function Hero() {
             </Link>
           </Button>
 
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button size="lg" variant="outline">
-                <Play className="size-4" />
-                {t("Hero.ctaTrailer")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="overflow-hidden p-0">
-              <div className="relative aspect-video w-full">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--surface-2),var(--bg))]" />
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="flex flex-col items-center gap-4 px-6 text-center">
-                    <span className="grid size-16 place-items-center rounded-full border border-[var(--accent)]/40 bg-[var(--accent-soft)]">
-                      <Play className="size-7 text-[var(--accent)]" />
-                    </span>
-                    <DialogTitle className="font-display text-2xl font-bold">
-                      {t("Hero.ctaTrailer")}
-                    </DialogTitle>
-                    <DialogDescription className="text-[var(--text-muted)]">
-                      {t("Hero.trailerComingSoon")}
-                    </DialogDescription>
-                  </div>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <TrailerDialog />
         </motion.div>
       </motion.div>
 
