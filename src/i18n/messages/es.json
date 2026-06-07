@@ -38,9 +38,17 @@
     "communityCtaFollow": "Síguenos"
   },
   "Games": {
+    "eyebrow": "Catálogo",
+    "title": "Nuestros juegos",
+    "subtitle": "Diez mundos hechos a mano, cada uno con su propia sombra.",
     "filterStatus": "Estado",
     "filterGenre": "Género",
     "filterAll": "Todos",
+    "filterAllGenres": "Todos los géneros",
+    "filtersClear": "Limpiar filtros",
+    "resultsCount": "{count, plural, =0 {Ningún juego} one {# juego} other {# juegos}}",
+    "resultsOf": "de {total}",
+    "resultsHeading": "Resultados",
     "empty": "No hay juegos que coincidan con esos filtros.",
     "platforms": "Plataformas",
     "year": "Año",

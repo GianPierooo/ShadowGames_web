@@ -14,6 +14,20 @@
 > sí es transversal: el Pre-Delivery Checklist y los anti-patrones de calidad.
 > El registro del output crudo está en el historial de la sesión.
 
+> **⚠️ WORKAROUND OBLIGATORIO con `--page`:** la skill, al ejecutar
+> `--persist --page X`, **sobreescribe MASTER.md** con el template genérico de
+> la categoría que detecte en ese momento (ha rotado entre "Gaming", "Creator
+> Economy Platform", etc.). Para no perder esta reconciliación, el flujo es:
+> ```bash
+> cp design-system/shadow-games-studio/MASTER.md /tmp/MASTER.bak
+> python search.py "..." --design-system --persist -p "Shadow Games Studio" --page <ruta>
+> cp /tmp/MASTER.bak design-system/shadow-games-studio/MASTER.md
+> # luego, reescribir pages/<ruta>.md sustituyendo el override genérico por
+> # uno reconciliado contra la marca real.
+> ```
+> Verificado 2026-06-06 con `--page juegos`: la skill regeneró MASTER como
+> "Vibrant & Block-based / Archivo + Space Grotesk". Descartado, restaurado.
+
 **Project:** Shadow Games Studio · **Category:** Gaming (indie) · **Generated:** 2026-06-06
 
 ---

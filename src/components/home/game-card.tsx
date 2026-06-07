@@ -34,7 +34,8 @@ export function GameCard({ game, statusLabel, className }: GameCardProps) {
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",
         className,
       )}
-      aria-label={game.title.es}
+      /* Sin aria-label: el accessible name se computa del contenido (h3 + meta),
+         que es más descriptivo. aria-label sobrescribía y generaba mismatch. */
     >
       {/* Fallback visual (gradiente). En H2 → <Image fill src={game.cardArt} /> */}
       <div
