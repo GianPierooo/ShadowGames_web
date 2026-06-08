@@ -10,16 +10,15 @@ interface ScreenshotsGalleryProps {
   shots: string[];
   /** Título del juego (para `alt` y el DialogTitle de la lightbox). */
   gameTitle: string;
-  /** Color de acento del juego (para el gradiente del placeholder). */
-  accentColor?: string;
 }
 
 /**
  * Galería sobria con lightbox. Sin captions, sin números, sin nav entre slides
  * (PRINCIPLES: cero chrome). Reutiliza `<GameImage>` para el fallback durante
- * fase 1; cuando haya assets, sustituir GameImage por <Image>.
+ * fase 1 con el violeta de marca (no el accentColor del juego: la marca
+ * dominante manda); cuando haya assets, sustituir GameImage por <Image>.
  */
-export function ScreenshotsGallery({ shots, gameTitle, accentColor }: ScreenshotsGalleryProps) {
+export function ScreenshotsGallery({ shots, gameTitle }: ScreenshotsGalleryProps) {
   const [open, setOpen] = useState<number | null>(null);
 
   if (shots.length === 0) return null;
@@ -43,7 +42,6 @@ export function ScreenshotsGallery({ shots, gameTitle, accentColor }: Screenshot
               <GameImage
                 src={src}
                 alt={`${gameTitle} — captura ${i + 1}`}
-                accentColor={accentColor}
                 initial={String(i + 1)}
               />
             </button>
@@ -61,7 +59,6 @@ export function ScreenshotsGallery({ shots, gameTitle, accentColor }: Screenshot
               <GameImage
                 src={shots[open]!}
                 alt={`${gameTitle} — captura ${open + 1}`}
-                accentColor={accentColor}
                 initial={String(open + 1)}
               />
             </div>

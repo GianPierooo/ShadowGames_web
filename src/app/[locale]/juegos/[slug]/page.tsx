@@ -61,7 +61,10 @@ export default async function GameDetailPage({ params }: PageProps) {
 
   const statusLabel = tStatus(game.status);
   const neighbors = getGameNeighbors(slug)!;
-  const accent = game.accentColor ?? "#8b5cf6";
+  // accentColor del juego = acento PUNTUAL (glow detrás del título); NO
+  // domina el hero ni los placeholders de screenshots (PRINCIPLES: la marca
+  // violeta dominante manda). Fallbacks visuales usan el violeta marca.
+  const accentTint = game.accentColor ?? "#8b5cf6";
 
   // CTA externo: solo se renderiza si hay al menos un link real (no "#").
   // PRINCIPLES: cero placeholders disabled (chrome inútil); si no hay URL
@@ -89,13 +92,9 @@ export default async function GameDetailPage({ params }: PageProps) {
         className="relative flex min-h-[100svh] items-end overflow-hidden"
         aria-labelledby="game-title"
       >
-        <GameImage
-          src={game.keyArt}
-          alt={game.title.es}
-          accentColor={accent}
-          initial={game.title.es.charAt(0)}
-        />
-        {/* Degradado inferior para legibilidad del texto */}
+        {/* Fallback de marca: violeta dominante, no accentColor del juego. */}
+        <GameImage src={game.keyArt} alt={game.title.es} initial={game.title.es.charAt(0)} />
+        {/* Degradado inferior para legibilidad */}
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-2/3"
           style={{
@@ -109,13 +108,24 @@ export default async function GameDetailPage({ params }: PageProps) {
             <Badge variant={game.status} className="mb-5">
               {statusLabel}
             </Badge>
-            <h1
-              id="game-title"
-              className="font-display font-bold leading-[0.95] tracking-tight text-white"
-              style={{ fontSize: "clamp(2.5rem, 7vw, 6rem)" }}
-            >
-              {game.title.es}
-            </h1>
+            <div className="relative">
+              {/* Acento puntual del juego: glow muy sutil detrás del h1.
+                  Diferencia los detalles entre sí sin romper la marca. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -inset-x-10 -inset-y-6 -z-10 blur-3xl opacity-40"
+                style={{
+                  background: `radial-gradient(40% 60% at 25% 50%, ${accentTint}55 0%, transparent 70%)`,
+                }}
+              />
+              <h1
+                id="game-title"
+                className="font-display font-bold leading-[0.95] tracking-tight text-white"
+                style={{ fontSize: "clamp(2.5rem, 7vw, 6rem)" }}
+              >
+                {game.title.es}
+              </h1>
+            </div>
             <p className="mt-4 max-w-2xl text-balance text-lg italic text-white/80 md:text-xl">
               {game.tagline.es}
             </p>
@@ -123,12 +133,15 @@ export default async function GameDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 2. Trailer — un único botón centrado */}
-      <section className="px-6 py-28 md:py-36" aria-label={t("trailer")}>
-        <div className="flex justify-center">
-          <TrailerDialog />
-        </div>
-      </section>
+      {/* 2. Trailer — solo si el juego tiene metadata real.
+          PRINCIPLES: cero placeholders "próximamente" decorativos. */}
+      {game.trailer && (
+        <section className="px-6 py-28 md:py-36" aria-label={t("trailer")}>
+          <div className="flex justify-center">
+            <TrailerDialog />
+          </div>
+        </section>
+      )}
 
       {/* 3. Descripción larga — una sola columna max-w-prose */}
       <section
@@ -157,11 +170,9 @@ export default async function GameDetailPage({ params }: PageProps) {
             <h2 id="screenshots-heading" className="sr-only">
               {game.title.es} — {t("screenshots")}
             </h2>
-            <ScreenshotsGallery
-              shots={game.screenshots}
-              gameTitle={game.title.es}
-              accentColor={accent}
-            />
+            {/* Placeholder de fase 1: usa violeta marca (no accentColor del
+                juego) para mantener la marca dominante. */}
+            <ScreenshotsGallery shots={game.screenshots} gameTitle={game.title.es} />
           </div>
         </section>
       )}

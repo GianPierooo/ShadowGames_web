@@ -17,7 +17,12 @@
 ### 1. Hero del juego (fullbleed, 100svh)
 
 - Key art como **única imagen**, fullbleed. Cuando no haya asset real,
-  fallback de gradiente cinematográfico derivado de `accentColor` + viñeta.
+  fallback de gradiente cinematográfico con el **violeta de marca** (no el
+  `accentColor` del juego — la marca tiene que dominar el frame entero).
+- `game.accentColor` se respeta solo como **acento puntual**: un glow muy
+  sutil detrás del h1 que tinta la atmósfera (apenas perceptible) y
+  diferencia los detalles entre sí sin romper la marca dominante. Idem en
+  screenshots: placeholders usan violeta marca, no accent del juego.
 - Overlay sobre el key art (esquina inferior izquierda):
   - **Badge de estado** (uno, pequeño, arriba del título)
   - **Título** en Fraunces, tamaño grande pero no monstruoso (`clamp(2.5rem, 7vw, 6rem)`)
@@ -27,12 +32,15 @@
 - Sin Reveal/animación: el hero ya está visible al cargar; aplicar fade
   retrasaría LCP innecesariamente (anotación de la auditoría H1).
 
-### 2. Tráiler
+### 2. Tráiler (graceful)
 
-- Una sección con **un único botón grande** centrado: "▶ Ver tráiler" → abre
-  `<TrailerDialog>` reutilizado del home.
-- Sin h2, sin eyebrow, sin descripción. El botón **es** la sección.
-- `py-24` mínimo.
+- Solo se renderiza si `game.trailer` está definido en el catálogo.
+- En fase 1 ningún juego tiene `trailer` aún → la sección se omite en silencio
+  en todos los detalles (PRINCIPLES: cero placeholders ni "Próximamente"
+  decorativos). El modal global del home sí muestra el teaser porque es el
+  hero del estudio; aquí no.
+- Cuando se añada `trailer: { type, src, poster }` al catálogo se activa un
+  único botón grande centrado (`<TrailerDialog>` reutilizado).
 
 ### 3. Descripción larga
 
