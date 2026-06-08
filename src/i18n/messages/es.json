@@ -69,7 +69,21 @@
   "Studio": {
     "title": "El estudio",
     "subtitle": "Mundos con sombra, hechos a mano",
-    "comingSoon": "Bio en construcción. Pronto."
+    "comingSoon": "Bio en construcción. Pronto.",
+    "eyebrow": "El estudio",
+    "manifestoHeading": "Hacemos mundos que se quedan después de apagar la pantalla.",
+    "bioP1": "Shadow Games es un estudio independiente que trabaja despacio. Cada juego empieza con una imagen fija — una habitación a contraluz, una calle vacía, un bosque que respira — y crece desde ahí hasta volverse jugable. No buscamos sistemas que se sostengan por sí solos; buscamos atmósferas que sostengan al jugador.",
+    "bioP2": "La sombra no es decoración: es material. Decide qué se ve, qué se intuye y qué se reserva para más tarde. Trabajar con ella obliga a quitar antes que añadir, y esa disciplina marca todo lo demás — desde la dirección de arte hasta el momento en que un personaje se queda callado.",
+    "bioP3": "Hacemos juegos cortos y densos. Preferimos diez horas que se recuerden a cincuenta que se olviden. Eso significa que cada escena se reescribe varias veces, que cada plano se compone como una foto, y que muchas ideas que nos gustan terminan fuera del corte final.",
+    "bioP4": "No tenemos prisa por crecer. El estudio existe para hacer un puñado de juegos a lo largo de los años, no para escalar. Si lo que ves en estas páginas te encuentra, es porque hicimos bien nuestro trabajo en silencio.",
+    "principle1Title": "La sombra primero",
+    "principle1Body": "Componemos a partir de lo que falta. Lo que no se ve sostiene lo que sí.",
+    "principle2Title": "Lento por elección",
+    "principle2Body": "Cada decisión se discute, se duerme, y se vuelve a discutir antes de aparecer en el juego.",
+    "principle3Title": "Hechos a mano",
+    "principle3Body": "Sin plantillas, sin atajos generativos. Cada textura, cada línea, cada plano lleva una decisión detrás.",
+    "closingLine": "Si algo de esto resuena, escríbenos.",
+    "closingCta": "Hablar con el estudio"
   },
   "Press": {
     "title": "Press kit",
