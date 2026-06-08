@@ -305,6 +305,18 @@ export function getAllGenres(): string[] {
   return Array.from(set).sort();
 }
 
+/**
+ * Vecinos del juego en el catálogo (orden de declaración).
+ * Wrap circular: el primero apunta al último como `prev` y viceversa.
+ */
+export function getGameNeighbors(slug: string): { prev: Game; next: Game } | null {
+  const idx = GAMES.findIndex((g) => g.slug === slug);
+  if (idx === -1) return null;
+  const prev = GAMES[(idx - 1 + GAMES.length) % GAMES.length]!;
+  const next = GAMES[(idx + 1) % GAMES.length]!;
+  return { prev, next };
+}
+
 /** Lista todos los estados únicos presentes en el catálogo. */
 export function getAllStatuses(): GameStatus[] {
   const set = new Set<GameStatus>();
