@@ -12,7 +12,7 @@ export async function FeaturedGames() {
   const games = getFeaturedGames().slice(0, 6);
 
   return (
-    <section className="relative px-6 py-24 md:py-32" aria-labelledby="games-heading">
+    <section className="cv-auto section-y relative px-6" aria-labelledby="games-heading">
       <div className="mx-auto max-w-6xl">
         <Reveal>
           <header className="mb-12 flex flex-col gap-3 md:mb-16">

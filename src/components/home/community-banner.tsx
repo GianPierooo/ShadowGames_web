@@ -13,7 +13,7 @@ export async function CommunityBanner() {
   const discordReady = SOCIAL.discord !== "#";
 
   return (
-    <section className="relative px-6 py-24 md:py-32" aria-labelledby="community-heading">
+    <section className="cv-auto section-y relative px-6" aria-labelledby="community-heading">
       <Reveal>
         <div className="grain relative mx-auto max-w-5xl overflow-hidden rounded-[var(--radius-lg)] border border-[var(--accent)]/30 px-8 py-16 text-center md:px-16 md:py-20">
           {/* Glow de fondo */}

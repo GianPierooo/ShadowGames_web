@@ -13,7 +13,7 @@ export async function StudioSection() {
 
   return (
     <section
-      className="relative border-t border-[var(--border)] px-6 py-24 md:py-32"
+      className="cv-auto section-y relative px-6"
       aria-labelledby="studio-heading"
     >
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-16">

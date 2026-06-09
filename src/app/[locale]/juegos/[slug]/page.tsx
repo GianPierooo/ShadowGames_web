@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { TrailerDialog } from "@/components/home/trailer-dialog";
 import { GameImage } from "@/components/games/game-image";
 import { ScreenshotsGallery } from "@/components/games/screenshots-gallery";
+import { routeAlternates, SITE_URL, SITE_LEGAL_NAME } from "@/lib/site";
 
 interface PageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -26,9 +27,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: game.title.es,
     description: game.tagline.es,
+    alternates: routeAlternates(`/juegos/${slug}`),
     openGraph: {
+      type: "article",
       title: game.title.es,
       description: game.tagline.es,
+      url: `/es/juegos/${slug}`,
     },
   };
 }
@@ -136,7 +140,7 @@ export default async function GameDetailPage({ params }: PageProps) {
       {/* 2. Trailer — solo si el juego tiene metadata real.
           PRINCIPLES: cero placeholders "próximamente" decorativos. */}
       {game.trailer && (
-        <section className="px-6 py-28 md:py-36" aria-label={t("trailer")}>
+        <section className="section-y px-6" aria-label={t("trailer")}>
           <div className="flex justify-center">
             <TrailerDialog />
           </div>
@@ -145,7 +149,7 @@ export default async function GameDetailPage({ params }: PageProps) {
 
       {/* 3. Descripción larga — una sola columna max-w-prose */}
       <section
-        className="px-6 pb-28 md:pb-36"
+        className="px-6 pb-24 md:pb-32"
         aria-labelledby="description-heading"
       >
         <div className="mx-auto max-w-prose">
@@ -163,7 +167,7 @@ export default async function GameDetailPage({ params }: PageProps) {
       {/* 4. Screenshots gallery */}
       {game.screenshots.length > 0 && (
         <section
-          className="px-6 pb-28 md:pb-36"
+          className="px-6 pb-24 md:pb-32"
           aria-labelledby="screenshots-heading"
         >
           <div className="mx-auto max-w-6xl">
@@ -191,7 +195,7 @@ export default async function GameDetailPage({ params }: PageProps) {
 
       {/* 6. CTAs externos — solo si hay URL real. Sin placeholders disabled. */}
       {primaryLinkKey && primaryLink && (
-        <section className="px-6 pb-28 md:pb-36" aria-label="Conseguir el juego">
+        <section className="px-6 pb-24 md:pb-32" aria-label="Conseguir el juego">
           <div className="mx-auto flex max-w-prose flex-col items-center gap-5">
             <Button asChild size="lg" variant="solid">
               <a href={primaryLink} target="_blank" rel="noopener noreferrer">
@@ -297,13 +301,15 @@ function GameJsonLd({ game, locale }: { game: Game; locale: string }) {
     "@type": "VideoGame",
     name: game.title.es,
     description: game.description.es,
+    url: `${SITE_URL}/es/juegos/${game.slug}`,
+    image: `${SITE_URL}/es/juegos/${game.slug}/opengraph-image`,
     inLanguage: locale,
     genre: game.genres,
     gamePlatform: game.platforms.map((p) => PLATFORM_LABEL[p] ?? p),
     applicationCategory: "Game",
     publisher: {
       "@type": "Organization",
-      name: "Shadow Games Studio",
+      name: SITE_LEGAL_NAME,
     },
     datePublished: String(game.year),
   };

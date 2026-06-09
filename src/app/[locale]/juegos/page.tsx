@@ -11,6 +11,7 @@ import { GameCard } from "@/components/home/game-card";
 import { FilterBar } from "@/components/games/filter-bar";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
+import { routeAlternates } from "@/lib/site";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -24,6 +25,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: t("title"),
     description: t("subtitle"),
+    alternates: routeAlternates("/juegos"),
+    openGraph: {
+      title: t("title"),
+      description: t("subtitle"),
+      url: "/es/juegos",
+    },
   };
 }
 
@@ -73,22 +80,20 @@ export default async function GamesIndexPage({ params, searchParams }: PageProps
 
   return (
     <>
-      {/* Page header */}
-      <section className="px-6 pt-32 pb-10 md:pt-40 md:pb-14">
+      {/* Page header — entrada CSS (el h1 es LCP, no debe gatearse tras JS) */}
+      <section className="section-top px-6 pb-10 md:pb-14">
         <div className="mx-auto max-w-6xl">
-          <Reveal>
-            <header className="flex flex-col gap-3">
-              <p className="text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
-                {t("eyebrow")}
-              </p>
-              <h1 className="font-display text-5xl font-bold leading-tight tracking-tight md:text-7xl">
-                {t("title")}
-              </h1>
-              <p className="max-w-2xl text-lg text-[var(--text-muted)] md:text-xl">
-                {t("subtitle")}
-              </p>
-            </header>
-          </Reveal>
+          <header className="flex flex-col gap-3">
+            <p className="intro text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
+              {t("eyebrow")}
+            </p>
+            <h1 className="intro-lcp font-display text-5xl font-bold leading-tight tracking-tight md:text-7xl">
+              {t("title")}
+            </h1>
+            <p className="intro intro-d2 max-w-2xl text-lg text-[var(--text-muted)] md:text-xl">
+              {t("subtitle")}
+            </p>
+          </header>
         </div>
       </section>
 
@@ -129,10 +134,6 @@ async function EmptyState() {
   const t = await getTranslations("Games");
   return (
     <div className="mx-auto flex max-w-md flex-col items-center gap-6 py-20 text-center">
-      <div
-        className="size-20 rounded-full border border-[var(--border)] bg-[var(--surface)]/40"
-        aria-hidden
-      />
       <p className="text-lg text-[var(--text-muted)]">{t("empty")}</p>
       <Button asChild size="md" variant="outline">
         <Link href="/juegos">{t("filtersClear")}</Link>

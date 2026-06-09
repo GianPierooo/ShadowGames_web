@@ -31,7 +31,7 @@ export function LegalPage({
   sections,
 }: LegalPageProps) {
   return (
-    <article className="mx-auto max-w-prose px-6 py-24 md:py-32">
+    <article className="mx-auto max-w-prose px-6 section-top pb-24 md:pb-32">
       <header className="mb-16">
         <p className="mb-4 text-xs uppercase tracking-[0.25em] text-[var(--text-subtle)]">
           {eyebrow}

@@ -3,6 +3,8 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { SOCIAL } from "@/lib/social";
 import { ContactForm } from "@/components/contact/contact-form";
+import { Toaster } from "@/components/ui/toaster";
+import { routeAlternates } from "@/lib/site";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -17,9 +19,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: t("title"),
     description: t("subtitle"),
+    alternates: routeAlternates("/contacto"),
     openGraph: {
       title: t("title"),
       description: t("subtitle"),
+      url: "/es/contacto",
     },
   };
 }
@@ -41,7 +45,7 @@ export default async function ContactPage({ params }: PageProps) {
   const t = await getTranslations("Contact");
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+    <div className="mx-auto max-w-6xl px-6 section-top pb-24 md:pb-32">
       <div className="grid grid-cols-1 gap-16 lg:grid-cols-[1.5fr_1fr] lg:gap-20">
         {/* Columna izquierda — Header + formulario ─────────────────── */}
         <section aria-labelledby="contact-title">
@@ -100,6 +104,9 @@ export default async function ContactPage({ params }: PageProps) {
           </ul>
         </aside>
       </div>
+
+      {/* Toaster montado solo aquí: Sonner no entra en el bundle del resto. */}
+      <Toaster />
     </div>
   );
 }

@@ -34,6 +34,15 @@
   --radius-input: 10px;
   --radius-lg: 20px;
 
+  /* Ritmo vertical de sección — escala única para todas las rutas.
+     Se aplica con la utilidad .section-y (mobile 96px / desktop 128px).
+     Las secciones que abren una página y quedan bajo el header fijo
+     usan además .section-top (clearance del header flotante). */
+  --space-section: 6rem;
+  --space-section-lg: 8rem;
+  --space-section-top: 8rem;
+  --space-section-top-lg: 10rem;
+
   /* Estados */
   --danger: #f87171;
 
@@ -122,6 +131,35 @@ body {
   letter-spacing: -0.02em;
 }
 
+/* ===========================================================================
+ * Ritmo vertical de sección — escala única (PRINCIPLES: espaciado homogéneo)
+ *   .section-y      → 96px / 128px  (separación estándar entre secciones)
+ *   .section-top    → 128px / 160px (primera sección, clearance del header)
+ * =========================================================================== */
+.section-y {
+  padding-top: var(--space-section);
+  padding-bottom: var(--space-section);
+}
+.section-top {
+  padding-top: var(--space-section-top);
+}
+/* Difiere el render de secciones bajo el fold: recorta el Style&Layout
+   inicial. `auto` recuerda el tamaño real tras el primer render, así no
+   genera saltos de scroll. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
+}
+@media (min-width: 768px) {
+  .section-y {
+    padding-top: var(--space-section-lg);
+    padding-bottom: var(--space-section-lg);
+  }
+  .section-top {
+    padding-top: var(--space-section-top-lg);
+  }
+}
+
 /* ===== Selección ===== */
 ::selection {
   background: var(--accent);
@@ -177,11 +215,93 @@ a:focus-visible {
   }
 }
 
+/* ===========================================================================
+ * Entrada above-the-fold — animación CSS pura (NO Motion/JS).
+ *
+ * Clave de rendimiento (LCP): estas animaciones arrancan en el primer paint,
+ * sin esperar a la hidratación de React. El elemento LCP (.intro-lcp) NUNCA
+ * parte de opacity:0 — solo desliza en transform manteniéndose opaco, así
+ * Chrome lo contabiliza como pintado de inmediato. El resto de elementos sí
+ * hacen fade, pero no son el LCP.
+ *
+ * Hidratación: el HTML server/cliente es idéntico (solo clases). En
+ * prefers-reduced-motion la media query de abajo colapsa la duración y el
+ * fill-mode `both` deja el estado final (visible) — sin contenido invisible.
+ * =========================================================================== */
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes intro-rise-opaque {
+  from {
+    transform: translateY(18px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.intro {
+  opacity: 0;
+  animation: intro-rise 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+}
+/* Variante para el elemento LCP: opaco de principio a fin. */
+.intro-lcp {
+  animation: intro-rise-opaque 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+}
+.intro-d1 {
+  animation-delay: 0.08s;
+}
+.intro-d2 {
+  animation-delay: 0.16s;
+}
+.intro-d3 {
+  animation-delay: 0.24s;
+}
+
+/* ===========================================================================
+ * Reveal on-scroll — CSS + IntersectionObserver (sin Motion).
+ *
+ * El componente <Reveal> (client, ~30 líneas) añade .is-visible al entrar en
+ * viewport. Sin la librería Motion en el bundle. Reduced-motion: la media
+ * query deja el contenido visible al instante. No-JS: el <noscript> del
+ * layout fuerza la visibilidad (progresive enhancement).
+ * =========================================================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-y, 24px));
+  transition:
+    opacity 0.6s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    transform 0.6s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+  transition-delay: var(--reveal-delay, 0s);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* ===== Hero: gradient mesh animado ===== */
 .mesh-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(70px);
+  /* 56px (antes 70px): glow casi idéntico, menos área de blur que rasterizar
+     → recorta el coste de Style&Layout del hero sin cambio perceptible. */
+  filter: blur(56px);
   will-change: transform;
   pointer-events: none;
 }
@@ -244,7 +364,8 @@ a:focus-visible {
   border-radius: 50%;
   background: var(--accent);
   filter: blur(1px);
-  will-change: transform, opacity;
+  /* Sin will-change: 10 partículas no necesitan 10 capas promovidas en el
+     primer render (encarecía Style&Layout); la animación sigue fluida. */
   animation: float-particle var(--p-dur, 7s) ease-in-out var(--p-delay, 0s) infinite;
 }
 

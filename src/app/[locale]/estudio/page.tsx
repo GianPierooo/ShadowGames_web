@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { routeAlternates } from "@/lib/site";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -14,9 +15,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: t("title"),
     description: t("subtitle"),
+    alternates: routeAlternates("/estudio"),
     openGraph: {
       title: t("title"),
       description: t("subtitle"),
+      url: "/es/estudio",
     },
   };
 }
@@ -108,7 +111,7 @@ export default async function StudioPage({ params }: PageProps) {
       {/* TODO: bio real — sustituir Studio.bioP1..P4 en es.json cuando el
           cliente pase la copia definitiva. Hasta entonces, placeholder
           coherente con "Mundos con sombra, hechos a mano". */}
-      <section className="px-6 py-28 md:py-36" aria-label="Manifiesto">
+      <section className="section-y px-6" aria-label="Manifiesto">
         <div className="mx-auto max-w-prose space-y-6 text-lg leading-relaxed text-[var(--text-muted)]">
           <p>{t("bioP1")}</p>
           <p>{t("bioP2")}</p>
@@ -119,7 +122,7 @@ export default async function StudioPage({ params }: PageProps) {
 
       {/* 3. Tres principios (texto puro, sin grid ni iconos) ───────────── */}
       <section
-        className="px-6 pb-28 md:pb-36"
+        className="px-6 pb-24 md:pb-32"
         aria-labelledby="principles-heading"
       >
         <div className="mx-auto max-w-prose">
@@ -142,7 +145,7 @@ export default async function StudioPage({ params }: PageProps) {
       </section>
 
       {/* 4. Cierre — una línea + un único CTA hacia /contacto ──────────── */}
-      <section className="px-6 pb-36 md:pb-44" aria-label="Contacto">
+      <section className="px-6 pb-24 md:pb-32" aria-label="Contacto">
         <div className="mx-auto flex max-w-prose flex-col items-center gap-7 text-center">
           <p className="text-lg italic text-[var(--text-muted)]">
             {t("closingLine")}

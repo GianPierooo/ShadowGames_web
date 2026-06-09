@@ -4,6 +4,7 @@ import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GAMES } from "@/lib/games";
 import { PressTrailerButton } from "@/components/press/press-trailer-button";
+import { routeAlternates } from "@/lib/site";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -18,9 +19,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: t("title"),
     description: t("subtitle"),
+    alternates: routeAlternates("/press"),
     openGraph: {
       title: t("title"),
       description: t("subtitle"),
+      url: "/es/press",
     },
   };
 }
@@ -47,7 +50,7 @@ export default async function PressPage({ params }: PageProps) {
   const t = await getTranslations("Press");
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-24 md:py-32">
+    <div className="mx-auto max-w-3xl px-6 section-top pb-24 md:pb-32">
       {/* 1. Header de página ──────────────────────────────────────── */}
       <header className="mb-24 md:mb-32">
         <p className="mb-5 text-xs uppercase tracking-[0.25em] text-[var(--text-subtle)]">

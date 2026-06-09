@@ -15,7 +15,7 @@ export async function MerchSection() {
 
   return (
     <section
-      className="grain relative border-t border-[var(--border)] px-6 py-24 md:py-32"
+      className="grain cv-auto section-y relative px-6"
       aria-labelledby="merch-heading"
     >
       <div className="mx-auto max-w-6xl">
@@ -40,15 +40,13 @@ export async function MerchSection() {
         <ul className="grid grid-cols-2 gap-5 lg:grid-cols-4">
           {SLOTS.map((i) => (
             <Reveal as="li" key={i} delay={i * 0.06}>
-              <div className="group relative aspect-square overflow-hidden rounded-[var(--radius-card)] border border-dashed border-[var(--border)] bg-[var(--surface)]/40">
+              {/* Placeholder sobrio. El estado "próximamente" lo da una sola
+                  vez el badge de la cabecera; PRINCIPLES: sin repetir la
+                  etiqueta en cada slot. */}
+              <div className="relative aspect-square overflow-hidden rounded-[var(--radius-card)] border border-dashed border-[var(--border)] bg-[var(--surface)]/40">
                 <div className="absolute inset-0 bg-[linear-gradient(160deg,var(--surface-2),var(--bg))] opacity-60" />
                 <div className="absolute inset-0 grid place-items-center text-[var(--text-subtle)]">
-                  <Sparkles className="size-8 transition-transform duration-300 group-hover:scale-110" />
-                </div>
-                <div className="absolute inset-x-0 bottom-0 p-3 text-center">
-                  <span className="text-xs uppercase tracking-widest text-[var(--text-subtle)]">
-                    {t("merchSubtitle")}
-                  </span>
+                  <Sparkles className="size-8" aria-hidden />
                 </div>
               </div>
             </Reveal>

@@ -5,6 +5,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { LegalPage } from "@/components/legal/legal-page";
+import { routeAlternates } from "@/lib/site";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -18,6 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const t = await getTranslations("Legal");
   return {
     title: t("legalTitle"),
+    alternates: routeAlternates("/aviso-legal"),
     robots: { index: true, follow: true },
   };
 }

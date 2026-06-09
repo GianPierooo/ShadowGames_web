@@ -7,6 +7,8 @@ import { Providers } from "@/components/providers";
 import { Header } from "@/components/site/header";
 import { Footer } from "@/components/site/footer";
 import { routing } from "@/i18n/routing";
+import { SOCIAL } from "@/lib/social";
+import { SITE_URL, SITE_NAME, SITE_LEGAL_NAME } from "@/lib/site";
 import "../globals.css";
 
 const fraunces = Fraunces({
@@ -58,11 +60,8 @@ export const metadata: Metadata = {
     title: "Shadow Games",
     description: "Estudio indie de videojuegos. Mundos con sombra, hechos a mano.",
   },
-  icons: {
-    icon: "/brand/logo.svg",
-    shortcut: "/brand/logo.svg",
-    apple: "/brand/logo.svg",
-  },
+  // Favicons y apple-touch-icon se resuelven por convención de archivos
+  // (src/app/icon.svg + src/app/apple-icon.tsx). El manifest vía manifest.ts.
   robots: {
     index: true,
     follow: true,
@@ -89,9 +88,35 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   setRequestLocale(locale);
   const t = await getTranslations("A11y");
 
+  // JSON-LD Organization (global). `sameAs` solo incluye URLs reales:
+  // los placeholders "#" se filtran para no emitir datos inválidos.
+  // TODO: cuando lleguen las URLs sociales reales (src/lib/social.ts),
+  // aparecerán automáticamente aquí.
+  const sameAs = Object.values(SOCIAL).filter((url) => url !== "#");
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_LEGAL_NAME,
+    alternateName: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/brand/logo.svg`,
+    description:
+      "Estudio indie de videojuegos. Mundos con sombra, hechos a mano.",
+    ...(sameAs.length > 0 && { sameAs }),
+  };
+
   return (
     <html lang={locale} suppressHydrationWarning className={`${fraunces.variable} ${interTight.variable}`}>
       <body>
+        {/* Sin JS, los bloques <Reveal> no recibirían .is-visible: forzamos
+            su visibilidad para no ocultar contenido (progressive enhancement). */}
+        <noscript>
+          <style>{".reveal{opacity:1 !important;transform:none !important}"}</style>
+        </noscript>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         <NextIntlClientProvider>
           <Providers>
             <a
