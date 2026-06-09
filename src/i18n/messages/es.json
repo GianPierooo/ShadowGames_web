@@ -164,13 +164,48 @@
   },
   "NotFound": {
     "code": "404",
-    "title": "Te perdiste en la penumbra",
-    "body": "La página que buscas no existe o se fue al otro lado.",
+    "title": "Te perdiste en la penumbra.",
+    "body": "La página que buscas no se encuentra.",
     "cta": "Volver al inicio"
   },
   "Error": {
-    "title": "Algo se rompió en la oscuridad",
-    "body": "Un error inesperado. Inténtalo de nuevo en un momento.",
-    "retry": "Reintentar"
+    "title": "Algo se quebró en las sombras.",
+    "body": "Si vuelve a pasar, escríbenos a shadowgames.devteam@gmail.com.",
+    "retry": "Reintentar",
+    "home": "Volver al inicio",
+    "devDetails": "Detalles técnicos"
+  },
+  "Legal": {
+    "eyebrow": "Legal",
+    "lastUpdated": "Última actualización",
+    "privacyTitle": "Política de privacidad",
+    "privacyP1Heading": "Responsable del tratamiento",
+    "privacyP1Body": "Shadow Games Studio (en adelante, \"el estudio\") es el responsable del tratamiento de los datos personales recogidos a través de este sitio web. Para cualquier consulta relacionada con el tratamiento de datos, puede escribir a shadowgames.devteam@gmail.com.",
+    "privacyP2Heading": "Datos que recogemos",
+    "privacyP2Body": "Recogemos únicamente los datos que el usuario nos facilita voluntariamente a través del formulario de contacto: nombre, dirección de correo electrónico, asunto y mensaje. Adicionalmente, se recogen datos técnicos esenciales (dirección IP, tipo de navegador y rutas visitadas) para mantener el funcionamiento del sitio y prevenir abusos.",
+    "privacyP3Heading": "Finalidad y base legal",
+    "privacyP3Body": "Los datos del formulario de contacto se utilizan exclusivamente para responder a la consulta planteada. La base legal del tratamiento es el consentimiento del usuario, prestado al enviar el formulario. Los datos técnicos se tratan bajo la base del interés legítimo del estudio en mantener un servicio seguro y operativo.",
+    "privacyP4Heading": "Conservación",
+    "privacyP4Body": "Los mensajes del formulario de contacto se conservan durante el tiempo necesario para gestionar la consulta y, como máximo, doce meses desde la última interacción, salvo obligación legal de conservación superior.",
+    "privacyP5Heading": "Derechos del usuario",
+    "privacyP5Body": "El usuario puede ejercer en cualquier momento sus derechos de acceso, rectificación, oposición, supresión, limitación del tratamiento y portabilidad de los datos. Para hacerlo, basta con escribir a shadowgames.devteam@gmail.com identificando el derecho que se desea ejercer.",
+    "privacyP6Heading": "Cookies",
+    "privacyP6Body": "Este sitio utiliza únicamente cookies técnicas esenciales para su funcionamiento. No se emplean cookies de terceros con fines publicitarios ni se construyen perfiles del usuario. Por ese motivo, no se muestra banner de cookies.",
+    "privacyP7Heading": "Contacto",
+    "privacyP7Body": "Para cualquier consulta sobre esta política de privacidad o el ejercicio de derechos, puede dirigirse a shadowgames.devteam@gmail.com.",
+    "legalTitle": "Aviso legal",
+    "legalP1Heading": "Titular del sitio",
+    "legalP1Body": "El presente sitio web es propiedad de Shadow Games Studio (en adelante, \"el estudio\"), responsable de su contenido y mantenimiento.",
+    "legalP2Heading": "Datos de contacto",
+    "legalP2Body": "Para cualquier comunicación relacionada con este sitio o el estudio, el correo electrónico de contacto es shadowgames.devteam@gmail.com.",
+    "legalP3Heading": "Condiciones de uso",
+    "legalP3Body": "El acceso a este sitio implica la aceptación de las presentes condiciones. El usuario se compromete a hacer un uso lícito del sitio y a no emplearlo para fines o efectos contrarios a la ley, a la moral o al orden público.",
+    "legalP4Heading": "Propiedad intelectual",
+    "legalP4Body": "Todos los contenidos del sitio (textos, imágenes, vídeos, key arts, logos, nombres de los juegos y elementos de diseño) son propiedad del estudio o de sus respectivos licenciantes, y están protegidos por la legislación de propiedad intelectual aplicable. Queda prohibida cualquier reproducción, distribución o transformación sin autorización expresa por escrito.",
+    "legalP5Heading": "Limitación de responsabilidad",
+    "legalP5Body": "El estudio no se hace responsable de los daños o perjuicios que pudieran derivarse del uso del sitio o de la información contenida en él, salvo en aquellos supuestos en que la legislación aplicable lo imponga.",
+    "legalP6Heading": "Ley aplicable",
+    "legalP6Body": "Las presentes condiciones se rigen por la legislación peruana. Para los visitantes residentes en la Unión Europea, el tratamiento de datos personales se ajusta adicionalmente al Reglamento (UE) 2016/679 (RGPD).",
+    "reviewNote": "Esta página es un borrador pendiente de revisión legal."
   }
 }
