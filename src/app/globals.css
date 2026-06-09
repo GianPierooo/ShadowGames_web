@@ -31,7 +31,11 @@
   /* Radios */
   --radius-pill: 999px;
   --radius-card: 14px;
+  --radius-input: 10px;
   --radius-lg: 20px;
+
+  /* Estados */
+  --danger: #f87171;
 
   /* Sombras cinematográficas */
   --shadow-glow: 0 0 60px -10px rgba(139, 92, 246, 0.4);
