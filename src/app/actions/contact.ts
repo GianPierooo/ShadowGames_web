@@ -92,8 +92,8 @@ export async function sendContactEmail(
     const resend = new Resend(apiKey);
     const { name, email, subject, message } = parsed.data;
     await resend.emails.send({
-      from: process.env.RESEND_FROM ?? "Shadow Games <noreply@shadowgames.studio>",
-      to: ["shadowgames.devteam@gmail.com"],
+      from: process.env.RESEND_FROM ?? "Shadow Games <onboarding@resend.dev>",
+      to: [process.env.CONTACT_EMAIL ?? "shadowgames.devteam@gmail.com"],
       replyTo: email,
       subject: `[Web] ${subject}`,
       text: `De: ${name} <${email}>\n\n${message}`,
