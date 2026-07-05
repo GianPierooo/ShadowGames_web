@@ -16,5 +16,9 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      # `npm install` (no `npm ci`) a propósito: el lock se genera en Windows y
+      # no registra los binarios nativos de Linux (rollup/swc), así que `npm ci`
+      # rompe en el runner por el bug de optionalDependencies de npm (npm/cli#4828).
+      # `npm install` resuelve el binario correcto de la plataforma en CI.
+      - run: npm install --no-audit --no-fund
       - run: npm run test:fixtures
