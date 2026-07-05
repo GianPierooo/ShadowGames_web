@@ -12,7 +12,7 @@ import type { AiPolicy, Jam } from "./types";
  * reprocesa UNA vez el detalle de las jams persistidas con versión anterior, así
  * las mejoras alcanzan a las jams ya cacheadas sin re-bajar todo cada corrida.
  */
-export const ENRICH_VERSION = 2;
+export const ENRICH_VERSION = 3;
 
 /** Primer fragmento que casa un patrón (para la auditoría de señales). */
 function firstHit(re: RegExp, text: string): string | null {
@@ -132,6 +132,53 @@ function detectAi(text: string): { policy: AiPolicy; signal: string } | null {
   return null;
 }
 
+// ---------------------------------------------------------------------------
+// Motor / engine (solo si la señal es clara; el orden fija la prioridad)
+// ---------------------------------------------------------------------------
+const ENGINES: { engine: string; re: RegExp }[] = [
+  { engine: "godot", re: /\bgodot\b/i },
+  { engine: "unity", re: /\bunity\s*(?:engine|3d)?\b/i },
+  { engine: "unreal", re: /\bunreal(?:\s*engine)?\b|\bue[45]\b/i },
+  { engine: "gamemaker", re: /\bgame\s*maker(?:\s*studio)?\b|\bgms2?\b/i },
+  { engine: "rpgmaker", re: /\brpg\s*maker\b/i },
+  { engine: "construct", re: /\bconstruct\s*[23]\b|\bscirra\b/i },
+  { engine: "renpy", re: /\bren['\s]?py\b/i },
+  { engine: "twine", re: /\btwine\b/i },
+  { engine: "bitsy", re: /\bbitsy\b/i },
+  { engine: "pico8", re: /\bpico-?8\b/i },
+  { engine: "phaser", re: /\bphaser\b/i },
+  { engine: "love2d", re: /\b(?:l[öo]ve\s*2d|love2d|l[öo]ve\s+framework)\b/i },
+  { engine: "html5", re: /\bhtml\s?5\b/i },
+];
+
+function detectEngine(text: string): { engine: string; signal: string } | null {
+  for (const e of ENGINES) {
+    const hit = firstHit(e.re, text);
+    if (hit) return { engine: e.engine, signal: `motor=${e.engine}←"${hit}"` };
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Solo / equipo (teamPolicy). "both" (solo o equipo) tiene prioridad.
+// ---------------------------------------------------------------------------
+const TEAM_BOTH =
+  /\bsolo\s+or\s+(?:in\s+)?(?:a\s+)?teams?\b|\balone\s+or\s+in\s+(?:a\s+)?teams?\b|\bindividually\s+or\s+in\s+teams?\b|\bsolo\s*\/\s*team\b|\bsolo\s+o\s+en\s+equipo\b/i;
+const TEAM_SOLO =
+  /\bsolo\s+only\b|\bsolo\s+jam\b|\bno\s+teams?\b|\bindividual\s+only\b|\bmust\s+(?:work|be)\s+(?:alone|solo)\b|\bone\s+person\s+only\b|\bsingle\s+developer\s+only\b|\bsin\s+equipos?\b|\b(?:de\s+forma\s+|solo\s+)?individual(?:mente)?\b/i;
+const TEAM_TEAM =
+  /\bteams?\s+(?:are\s+)?(?:allowed|welcome|permitted|encouraged)\b|\bteams?\s+of\s+(?:up\s+to\s+)?\d+\b|\bin\s+teams?\b|\bform\s+a\s+team\b|\bwork\s+in\s+teams?\b|\bequipos?\s+(?:permitidos|de\s+hasta)\b|\ben\s+equipo\b/i;
+
+function detectTeam(text: string): { team: "solo" | "team" | "both"; signal: string } | null {
+  const both = firstHit(TEAM_BOTH, text);
+  if (both) return { team: "both", signal: `equipo=both←"${both}"` };
+  const solo = firstHit(TEAM_SOLO, text);
+  if (solo) return { team: "solo", signal: `equipo=solo←"${solo}"` };
+  const team = firstHit(TEAM_TEAM, text);
+  if (team) return { team: "team", signal: `equipo=team←"${team}"` };
+  return null;
+}
+
 function haystack(jam: Jam): string {
   return [jam.title, jam.theme, ...jam.tags, jam.prizeSummary, ...jam.hosts.map((h) => h.name)]
     .filter(Boolean)
@@ -212,21 +259,49 @@ export function enrichHeuristics(jam: Jam, detailText?: string): Jam {
     }
   }
 
+  // --- motor / engine (sólo si no viene ya de la fuente) ---
+  let engine = jam.engine ?? null;
+  let engineDetected = false;
+  if (engine == null) {
+    const e = detectEngine(text);
+    if (e) {
+      engine = e.engine;
+      engineDetected = true;
+      signals.push(e.signal);
+    }
+  }
+
+  // --- solo / equipo (sólo si no viene ya de la fuente) ---
+  let teamPolicy = jam.teamPolicy ?? null;
+  let teamDetected = false;
+  if (teamPolicy == null) {
+    const t = detectTeam(text);
+    if (t) {
+      teamPolicy = t.team;
+      teamDetected = true;
+      signals.push(t.signal);
+    }
+  }
+
   // --- confianza ---
   const enrichmentConfidence = hasDetail
     ? Math.min(
-        0.95,
+        0.96,
         Math.max(0.8, jam.enrichmentConfidence) +
           (prizeDetected ? 0.04 : 0) +
           (cashDetected ? 0.03 : 0) +
-          (aiDetected ? 0.08 : 0),
+          (aiDetected ? 0.08 : 0) +
+          (engineDetected ? 0.02 : 0) +
+          (teamDetected ? 0.02 : 0),
       )
     : Math.min(
         0.8,
         jam.enrichmentConfidence +
           (langDetected ? 0.05 : 0) +
           (prizeDetected ? 0.1 : 0) +
-          (aiDetected ? 0.15 : 0),
+          (aiDetected ? 0.15 : 0) +
+          (engineDetected ? 0.05 : 0) +
+          (teamDetected ? 0.05 : 0),
       );
 
   return {
@@ -236,6 +311,8 @@ export function enrichHeuristics(jam: Jam, detailText?: string): Jam {
     prizeValueUsd,
     prizeSummary,
     aiPolicy,
+    engine,
+    teamPolicy,
     enrichmentConfidence,
     enrichmentVersion: ENRICH_VERSION,
     enrichmentSignals: signals.length ? signals.join("; ").slice(0, 300) : (jam.enrichmentSignals ?? null),

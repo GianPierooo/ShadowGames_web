@@ -28,7 +28,7 @@ import {
   parseJamFilters,
 } from "@/lib/jams/filters";
 import { queryJams } from "@/lib/jams/db";
-import { SOURCE_ORDER } from "@/lib/jams/labels";
+import { SOURCE_ORDER, ENGINE_ORDER } from "@/lib/jams/labels";
 import { routeAlternates } from "@/lib/site";
 import { FilterBar } from "@/components/jams/FilterBar";
 import { JamGrid } from "@/components/jams/JamGrid";
@@ -99,6 +99,9 @@ export default async function JamsPage({
   // El bar ofrece TODAS las fuentes registradas (las 7), aunque alguna no tenga
   // jams vigentes ahora mismo: seleccionar una vacía muestra el estado vacío.
   const availableSources = SOURCE_ORDER;
+  // Motores SÍ se limitan a los presentes en los datos (no listar chips vacíos).
+  const enginesPresent = new Set(source.map((j) => j.engine).filter(Boolean));
+  const availableEngines = ENGINE_ORDER.filter((e) => enginesPresent.has(e));
 
   const counterSub =
     activeCount > 0
@@ -126,7 +129,10 @@ export default async function JamsPage({
         </div>
       </header>
 
-      <FilterBar availableSources={availableSources} />
+      <FilterBar
+        availableSources={availableSources}
+        availableEngines={availableEngines}
+      />
 
       <div className="pt-6">
         {jams.length === 0 ? (

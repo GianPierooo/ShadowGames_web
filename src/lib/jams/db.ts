@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import type { AiPolicy, Jam, JamHost, JamMode, JamSource } from "./types";
+import type { AiPolicy, Jam, JamHost, JamMode, JamSource, TeamPolicy } from "./types";
 import type { JamSort } from "./filters";
 
 /**
@@ -64,13 +64,13 @@ export async function upsertJams(jams: Jam[]): Promise<number> {
           start_at, end_at, duration_days, theme, tags, languages,
           has_prize, prize_summary, prize_value_usd, ai_policy, mode,
           participants, country, ranked, featured, enrichment_confidence,
-          enrichment_version, enrichment_signals, raw
+          enrichment_version, enrichment_signals, engine, team_policy, raw
         ) values (
           ${j.source}, ${j.sourceId}, ${j.url}, ${j.title}, ${toJson(j.hosts)},
           ${j.startAt}, ${j.endAt}, ${j.durationDays}, ${j.theme}, ${j.tags}::text[], ${j.languages}::text[],
           ${j.hasPrize}, ${j.prizeSummary}, ${j.prizeValueUsd}, ${j.aiPolicy}, ${j.mode},
           ${j.participants}, ${j.country}, ${j.ranked}, ${j.featured}, ${j.enrichmentConfidence},
-          ${j.enrichmentVersion ?? 0}, ${j.enrichmentSignals ?? null}, ${toJson(j)}
+          ${j.enrichmentVersion ?? 0}, ${j.enrichmentSignals ?? null}, ${j.engine ?? null}, ${j.teamPolicy ?? null}, ${toJson(j)}
         )
         on conflict (source, source_id) do update set
           url                   = excluded.url,
@@ -94,6 +94,8 @@ export async function upsertJams(jams: Jam[]): Promise<number> {
           enrichment_confidence = excluded.enrichment_confidence,
           enrichment_version    = excluded.enrichment_version,
           enrichment_signals    = excluded.enrichment_signals,
+          engine                = excluded.engine,
+          team_policy           = excluded.team_policy,
           raw                   = excluded.raw,
           last_seen_at          = now()
       `;
@@ -117,6 +119,12 @@ export interface JamQueryFilters {
   mode?: JamMode;
   /** Filtra por pertenencia a un conjunto de fuentes (IN). */
   sources?: JamSource[];
+  /** Filtra por pertenencia a un conjunto de motores (IN). */
+  engines?: string[];
+  /** Política solo/equipo. */
+  teamPolicy?: TeamPolicy;
+  /** Sólo jams con ranking. */
+  ranked?: boolean;
   /** Búsqueda por título (ILIKE). */
   q?: string;
   /** Orden (default: deadline). */
@@ -148,6 +156,8 @@ interface JamRow {
   ranked: boolean | null;
   featured: boolean;
   enrichment_confidence: number;
+  engine: string | null;
+  team_policy: string | null;
 }
 
 /**
@@ -166,6 +176,10 @@ export async function queryJams(filters: JamQueryFilters = {}): Promise<Jam[]> {
   if (filters.mode) conds.push(sql`mode = ${filters.mode}`);
   if (filters.sources?.length)
     conds.push(sql`source = any(${filters.sources}::text[])`);
+  if (filters.engines?.length)
+    conds.push(sql`engine = any(${filters.engines}::text[])`);
+  if (filters.teamPolicy) conds.push(sql`team_policy = ${filters.teamPolicy}`);
+  if (filters.ranked) conds.push(sql`ranked is true`);
   if (filters.q) conds.push(sql`title ilike ${"%" + filters.q + "%"}`);
 
   const whereSql = conds.length
@@ -187,7 +201,8 @@ export async function queryJams(filters: JamQueryFilters = {}): Promise<Jam[]> {
       source, source_id, url, title, hosts,
       start_at, end_at, duration_days, theme, tags, languages,
       has_prize, prize_summary, prize_value_usd, ai_policy, mode,
-      participants, country, ranked, featured, enrichment_confidence
+      participants, country, ranked, featured, enrichment_confidence,
+      engine, team_policy
     from radar.jams
     ${whereSql}
     ${orderSql}
@@ -234,6 +249,8 @@ function mapRow(row: JamRow): Jam {
     ranked: row.ranked,
     featured: row.featured,
     enrichmentConfidence: row.enrichment_confidence,
+    engine: row.engine,
+    teamPolicy: (row.team_policy as TeamPolicy | null) ?? null,
   };
 }
 
@@ -253,6 +270,8 @@ export interface PersistedEnrichment {
   /** Versión de heurística con la que se enriqueció (para invalidar caché). */
   enrichmentVersion: number;
   enrichmentSignals: string | null;
+  engine: string | null;
+  teamPolicy: TeamPolicy | null;
 }
 
 /**
@@ -276,11 +295,13 @@ export async function getPersistedEnrichment(): Promise<
       enrichment_confidence: number;
       enrichment_version: number;
       enrichment_signals: string | null;
+      engine: string | null;
+      team_policy: string | null;
     }[]
   >`
     select source, source_id, ai_policy, theme, has_prize,
            prize_summary, prize_value_usd, languages, enrichment_confidence,
-           enrichment_version, enrichment_signals
+           enrichment_version, enrichment_signals, engine, team_policy
     from radar.jams
   `;
 
@@ -296,6 +317,8 @@ export async function getPersistedEnrichment(): Promise<
       enrichmentConfidence: r.enrichment_confidence,
       enrichmentVersion: r.enrichment_version ?? 0,
       enrichmentSignals: r.enrichment_signals,
+      engine: r.engine,
+      teamPolicy: (r.team_policy as TeamPolicy | null) ?? null,
     });
   }
   return map;
@@ -327,7 +350,8 @@ export async function selectAlertCandidates(limit: number): Promise<Jam[]> {
       source, source_id, url, title, hosts,
       start_at, end_at, duration_days, theme, tags, languages,
       has_prize, prize_summary, prize_value_usd, ai_policy, mode,
-      participants, country, ranked, featured, enrichment_confidence
+      participants, country, ranked, featured, enrichment_confidence,
+      engine, team_policy
     from radar.jams
     where notified_at is null
       and (end_at is null or end_at >= now())

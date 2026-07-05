@@ -240,6 +240,9 @@
       "duration": "Duración",
       "more": "Más filtros",
       "aiHeading": "Política de IA",
+      "engine": "Motor",
+      "team": "Participación",
+      "ranked": "Con ranking",
       "exportIcal": "Exportar iCal",
       "exportCsv": "Exportar CSV"
     },
@@ -258,6 +261,11 @@
       "relampago": "Relámpago · ≤48 h",
       "corta": "Corta · 2–7 días",
       "larga": "Larga · +7 días"
+    },
+    "equipo": {
+      "solo": "En solitario",
+      "team": "En equipo",
+      "both": "Solo o equipo"
     },
     "language": {
       "es": "Español",

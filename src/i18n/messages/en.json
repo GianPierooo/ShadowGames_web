@@ -240,6 +240,9 @@
       "duration": "Duration",
       "more": "More filters",
       "aiHeading": "AI policy",
+      "engine": "Engine",
+      "team": "Participation",
+      "ranked": "Ranked",
       "exportIcal": "Export iCal",
       "exportCsv": "Export CSV"
     },
@@ -258,6 +261,11 @@
       "relampago": "Sprint · ≤48h",
       "corta": "Short · 2–7 days",
       "larga": "Long · 7+ days"
+    },
+    "equipo": {
+      "solo": "Solo",
+      "team": "Team",
+      "both": "Solo or team"
     },
     "language": {
       "es": "Spanish",
