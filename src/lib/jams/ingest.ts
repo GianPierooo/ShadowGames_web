@@ -1,6 +1,6 @@
 import type { Jam } from "./types";
 import { runAllAdapters, type AdapterReport } from "./sources";
-import { enrichHeuristics } from "./enrich";
+import { ENRICH_VERSION, enrichHeuristics } from "./enrich";
 import { dedupe, sanitize } from "./normalize";
 import {
   getPersistedEnrichment,
@@ -103,15 +103,24 @@ async function runDetailPass(jams: Jam[]): Promise<{
     if (!jam) continue;
     const prev = persisted.get(`${jam.source}::${jam.sourceId}`);
 
-    // Cache hit: ya bien enriquecida → arrastra y no vuelve a bajar el detalle.
-    if (prev && prev.enrichmentConfidence >= ENRICHED_THRESHOLD) {
-      out[i] = { ...jam, ...prev };
+    // Arrastra SIEMPRE el enriquecimiento persistido: si esta corrida no llega a
+    // re-bajar su detalle (por el tope), NO se degrada a datos de listado.
+    if (prev) out[i] = { ...jam, ...prev };
+
+    // Cache hit: bien enriquecida Y con la versión de heurística ACTUAL → no re-baja.
+    if (
+      prev &&
+      prev.enrichmentConfidence >= ENRICHED_THRESHOLD &&
+      prev.enrichmentVersion >= ENRICH_VERSION
+    ) {
       cached++;
       continue;
     }
 
-    // Candidatos: itch de baja confianza (su detalle trae premio/IA/idioma).
-    if (jam.source === "itch" && jam.enrichmentConfidence < ENRICHED_THRESHOLD) {
+    // Candidatos: itch pendiente de procesar con la versión actual (nueva, de baja
+    // confianza, o enriquecida con reglas VIEJAS → se reprocesa el detalle una vez).
+    // Los que excedan el tope conservan lo arrastrado arriba (no se degradan).
+    if (jam.source === "itch") {
       candidateIdx.push(i);
     }
   }
@@ -131,13 +140,18 @@ async function runDetailPass(jams: Jam[]): Promise<{
       batch.map(async (idx) => {
         const target = out[idx]!;
         const text = await fetchItchDetail(target.url);
-        return { idx, jam: enrichHeuristics(target, text) };
+        // detalle null (fallo tolerado) → no re-enriquece; conserva el listado.
+        return { idx, jam: text != null ? enrichHeuristics(target, text) : null };
       }),
     );
     for (const r of settled) {
       if (r.status === "fulfilled") {
-        out[r.value.idx] = r.value.jam;
-        fetched++;
+        if (r.value.jam) {
+          out[r.value.idx] = r.value.jam;
+          fetched++;
+        } else {
+          failed++; // detalle no disponible (null)
+        }
       } else {
         failed++;
         const reason = r.reason instanceof Error ? r.reason.message : String(r.reason);

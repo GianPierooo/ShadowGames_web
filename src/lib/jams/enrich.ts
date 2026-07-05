@@ -4,14 +4,28 @@ import type { AiPolicy, Jam } from "./types";
  * Enriquecimiento por REGLAS/REGEX (sin IA). Un único `enrichHeuristics`:
  *  - Pass 1 (sin detalle): patrones sobre título/tema/tags/premio/hosts.
  *  - Pass 2 (con `detailText`): los mismos patrones sobre el texto de la página
- *    de detalle (mucho más rico → premio/IA/idioma). Sube la confianza.
+ *    de detalle (mucho más rico → premio/IA/idioma). Sube la confianza y estampa
+ *    ENRICH_VERSION para marcar la jam como ya procesada (caché).
  * Sin señal concluyente → aiPolicy "unknown" (estado honesto, no se inventa).
+ *
+ * ENRICH_VERSION: SÚBELA al mejorar las heurísticas. El pipeline (runDetailPass)
+ * reprocesa UNA vez el detalle de las jams persistidas con versión anterior, así
+ * las mejoras alcanzan a las jams ya cacheadas sin re-bajar todo cada corrida.
  */
+export const ENRICH_VERSION = 2;
 
-// --- idioma (español) ---
+/** Primer fragmento que casa un patrón (para la auditoría de señales). */
+function firstHit(re: RegExp, text: string): string | null {
+  const m = text.match(re);
+  return m ? m[0].replace(/\s+/g, " ").trim().slice(0, 40) : null;
+}
+
+// ---------------------------------------------------------------------------
+// Idioma (español)
+// ---------------------------------------------------------------------------
 const ES_ACCENT = /[áéíóúñ¿¡]/;
 const ES_KEYWORD =
-  /\b(videojuego|convocatoria|beca|premio|espa[nñ]ol|narrativa|desarrollo|concurso|reglas|participa|jam\s+de)\b/i;
+  /\b(videojuego|convocatoria|beca|premio|espa[nñ]ol|narrativa|desarrollo|concurso|reglas|participa|jam\s+de|jugador|desarrollador|jurado|bases)\b/i;
 const ES_STOPWORDS =
   /\b(que|para|con|los|las|una|del|por|como|pero|este|esta|muy|sobre|donde|cuando)\b/gi;
 
@@ -20,13 +34,30 @@ function looksSpanish(text: string): boolean {
   return (text.match(ES_STOPWORDS)?.length ?? 0) >= 4;
 }
 
-// --- premio ---
+// ---------------------------------------------------------------------------
+// Premio
+// ---------------------------------------------------------------------------
 const PRIZE_NONE =
-  /\bno\s+prizes?\b|\bno\s+cash\s+prize|\bthere\s+are\s+no\s+prizes|\bsin\s+premios?\b|\bno\s+hay\s+premios?\b/i;
+  /\bno\s+(?:cash\s+)?prizes?\b|\bthere\s+(?:are|is)\s+no\s+prizes?\b|\bfor\s+fun,?\s+no\s+prizes?\b|\bjust\s+for\s+fun\b|\bsin\s+premios?\b|\bno\s+hay\s+premios?\b/i;
+/** Señal de que hay algún premio (efectivo o en especie). */
 const PRIZE_HINT =
-  /\$\s?\d|€\s?\d|£\s?\d|s\/\.?\s?\d|\bin\s+prizes\b|\bprize\s+pool\b|\bprizes?\b|\bpremi(?:o|os)\b|\bbeca\b|\breward\b|\bbolsa\s+de\s+premios\b|\bcash\s+prize\b/i;
-const PRIZE_AMOUNT_G =
-  /(?:\$|€|£|us\$|usd\s?|s\/\.?\s?)\s?(\d[\d.,]*\s?[km]?)/gi;
+  /\bin\s+prizes\b|\bprize\s+pool\b|\bgrand\s+prize\b|\bprizes?\b|\bpremi(?:o|os)\b|\breward(?:s|ed)?\b|\bcash\s+prize\b|\bbolsa\s+de\s+premios\b|\bbeca\b/i;
+/** Señal de premio EN EFECTIVO (además del importe numérico). */
+const CASH_HINT =
+  /\bcash\s+prize\b|\bcash\b|\bpremio\s+en\s+(?:efectivo|met[aá]lico)\b|\bpaypal\b|\bin\s+prizes\b|\bprize\s+pool\b/i;
+/** Importes monetarios: $, US$, USD, €, £, S/. con miles y sufijos k/M. */
+const PRIZE_AMOUNT_G = /(?:\$|€|£|us\$|usd\s?|s\/\.?\s?)\s?(\d[\d.,]*\s?[km]?)/gi;
+/** Premios EN ESPECIE (no efectivo). */
+const INKIND: { re: RegExp; tag: string }[] = [
+  { re: /\bsteam\s+keys?\b/i, tag: "steam keys" },
+  { re: /\bgift\s+cards?\b/i, tag: "gift cards" },
+  { re: /\basset\s+packs?\b/i, tag: "asset packs" },
+  { re: /\basset\s+store\b/i, tag: "asset store" },
+  { re: /\b(?:software|game)\s+licen[cs]es?\b/i, tag: "licenses" },
+  { re: /\bhardware\b/i, tag: "hardware" },
+  { re: /\bmerch(?:andise)?\b/i, tag: "merch" },
+  { re: /\bswag\b/i, tag: "swag" },
+];
 
 function parseAmount(token: string): number | null {
   let t = token.toLowerCase().replace(/\s+/g, "");
@@ -45,7 +76,7 @@ function parseAmount(token: string): number | null {
   return Number.isNaN(n) ? null : Math.round(n * mult);
 }
 
-/** Mayor importe monetario encontrado en el texto (o null). */
+/** Mayor importe monetario encontrado (o null). Aproxima no-USD a USD (sin tasas). */
 function maxAmount(text: string): number | null {
   let best: number | null = null;
   for (const m of text.matchAll(PRIZE_AMOUNT_G)) {
@@ -57,11 +88,49 @@ function maxAmount(text: string): number | null {
   return best;
 }
 
-// --- política de IA ---
-const AI_BANNED =
-  /\bno\s+(?:generative\s+)?a\.?i\.?\b|\bai\s+is\s+not\s+allowed\b|\bno\s+ai[-\s]?generated\b|\bai[-\s]?free\b|\bno\s+generative\s+ai\b|\bgenerative\s+ai\s+is\s+(?:not\s+allowed|prohibited|banned|forbidden)\b|\bno\s+ai\s+art\b|\bai\s+art\s+is\s+not\s+allowed\b|\bsin\s+ia\b|\bia\s+(?:generativa\s+)?(?:prohibida|no\s+permitida|no\s+est[aá]\s+permitida)\b|\bprohibida\s+la\s+ia\b/i;
-const AI_ALLOWED =
-  /\bai\s+(?:is\s+)?(?:allowed|permitted|encouraged|welcome)\b|\bgenerative\s+ai\s+is\s+allowed\b|\bai[-\s]?friendly\b|\bia\s+(?:est[aá]\s+)?permitida\b|\bse\s+permite\s+(?:el\s+uso\s+de\s+)?(?:la\s+)?ia\b/i;
+function firstInKind(text: string): { tag: string } | null {
+  for (const k of INKIND) if (k.re.test(text)) return { tag: k.tag };
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Política de IA (maneja negaciones y variantes es/en; prohíbe > permite)
+// ---------------------------------------------------------------------------
+const AI_BANNED_PATTERNS: { re: RegExp; tag: string }[] = [
+  { re: /\bno\s+(?:generative\s+)?a\.?i\.?\b/i, tag: "no ai" },
+  { re: /\bwithout\s+(?:the\s+use\s+of\s+)?(?:generative\s+)?a\.?i\.?\b/i, tag: "without ai" },
+  {
+    re: /\b(?:generative\s+)?a\.?i\.?\s+(?:art\s+|tools?\s+|content\s+)?(?:is|are)\s+(?:not\s+(?:allowed|permitted|welcome)|prohibited|banned|forbidden)\b/i,
+    tag: "ai is not allowed",
+  },
+  { re: /\b(?:no|not)\s+ai[-\s]?(?:generated|art|assets?|content|tools?)\b/i, tag: "no ai-generated" },
+  { re: /\bai[-\s]?free\b/i, tag: "ai-free" },
+  { re: /\b(?:human|hand)[-\s]?made\s+only\b/i, tag: "human-made only" },
+  { re: /\bsin\s+(?:el\s+uso\s+de\s+)?ia\b/i, tag: "sin ia" },
+  { re: /\bia\s+(?:generativa\s+)?(?:no\s+permitida|prohibida|no\s+est[aá]\s+permitida)\b/i, tag: "ia prohibida" },
+  { re: /\bprohibid[ao]\s+(?:el\s+uso\s+de\s+)?(?:la\s+)?ia\b/i, tag: "prohibida la ia" },
+  { re: /\bno\s+se\s+permite[^.?!]{0,24}\bia\b/i, tag: "no se permite ia" },
+];
+const AI_ALLOWED_PATTERNS: { re: RegExp; tag: string }[] = [
+  {
+    re: /\b(?:generative\s+)?a\.?i\.?\s+(?:is|are)\s+(?:allowed|permitted|welcome|encouraged|fine|ok(?:ay)?)\b/i,
+    tag: "ai allowed",
+  },
+  { re: /\bai[-\s]?friendly\b/i, tag: "ai-friendly" },
+  { re: /\b(?:you\s+(?:can|may)|feel\s+free\s+to)\s+use\s+(?:generative\s+)?ai\b/i, tag: "you can use ai" },
+  { re: /\bia\s+(?:generativa\s+)?(?:est[aá]\s+)?permitida\b/i, tag: "ia permitida" },
+  { re: /\bse\s+permite\s+(?:el\s+uso\s+de\s+)?(?:la\s+)?ia\b/i, tag: "se permite ia" },
+];
+
+function detectAi(text: string): { policy: AiPolicy; signal: string } | null {
+  for (const p of AI_BANNED_PATTERNS) {
+    if (p.re.test(text)) return { policy: "banned", signal: `ia=banned←"${p.tag}"` };
+  }
+  for (const p of AI_ALLOWED_PATTERNS) {
+    if (p.re.test(text)) return { policy: "allowed", signal: `ia=allowed←"${p.tag}"` };
+  }
+  return null;
+}
 
 function haystack(jam: Jam): string {
   return [jam.title, jam.theme, ...jam.tags, jam.prizeSummary, ...jam.hosts.map((h) => h.name)]
@@ -71,15 +140,15 @@ function haystack(jam: Jam): string {
 }
 
 /**
- * Heurísticas por reglas. Con `detailText` (pass 2) los patrones corren sobre
- * el texto de la página de detalle y la confianza sube (y se fija piso 0.8 para
- * marcar la jam como ya procesada → cacheo, no se vuelve a bajar el detalle).
- * Devuelve una copia; no muta el input.
+ * Heurísticas por reglas. Con `detailText` (pass 2) los patrones corren sobre el
+ * texto de la página de detalle y la confianza sube (piso 0.8 → caché). No muta
+ * el input; devuelve una copia con `enrichmentVersion` y `enrichmentSignals`.
  */
 export function enrichHeuristics(jam: Jam, detailText?: string): Jam {
   const detail = detailText?.toLowerCase() ?? "";
   const hasDetail = detail.length > 0;
   const text = hasDetail ? `${haystack(jam)} ${detail}` : haystack(jam);
+  const signals: string[] = [];
 
   // --- idioma ---
   let languages = jam.languages;
@@ -87,30 +156,47 @@ export function enrichHeuristics(jam: Jam, detailText?: string): Jam {
   if (languages.length === 0) {
     languages = looksSpanish(text) ? ["es"] : ["en"];
     langDetected = true;
+    signals.push(`idioma=${languages[0]}`);
   } else if (hasDetail && languages.join(",") === "en" && looksSpanish(detail)) {
-    // El detalle revela que en realidad la convocatoria es en español.
     languages = ["es"];
     langDetected = true;
+    signals.push(`idioma=es←detalle`);
   }
 
-  // --- premio (sólo si es desconocido: null) ---
+  // --- premio (sólo si es desconocido: null) — distingue efectivo vs especie ---
   let hasPrize = jam.hasPrize;
   let prizeValueUsd = jam.prizeValueUsd;
   let prizeSummary = jam.prizeSummary;
   let prizeDetected = false;
+  let cashDetected = false;
   if (hasPrize == null) {
     if (PRIZE_NONE.test(text)) {
       hasPrize = false;
       prizeDetected = true;
-    } else if (PRIZE_HINT.test(text)) {
-      hasPrize = true;
-      prizeDetected = true;
+      signals.push(`premio=no←"${firstHit(PRIZE_NONE, text)}"`);
+    } else {
       const amount = maxAmount(text);
-      if (amount != null && prizeValueUsd == null) {
-        prizeValueUsd = amount;
-        prizeSummary = prizeSummary ?? `$${amount.toLocaleString("en-US")}`;
+      const inKind = firstInKind(text);
+      const cashy = amount != null || CASH_HINT.test(text);
+      if (amount != null || inKind || PRIZE_HINT.test(text)) {
+        hasPrize = true;
+        prizeDetected = true;
+        if (amount != null) {
+          // EFECTIVO: hay una cifra monetaria.
+          cashDetected = true;
+          if (prizeValueUsd == null) prizeValueUsd = amount;
+          prizeSummary = prizeSummary ?? `$${amount.toLocaleString("en-US")}`;
+          signals.push(`premio=cash $${amount}←"${firstHit(PRIZE_AMOUNT_G, text)}"`);
+        } else if (inKind) {
+          // EN ESPECIE: keys/asset packs/gift cards… sin cifra.
+          prizeSummary = prizeSummary ?? `Premio en especie (${inKind.tag})`;
+          signals.push(`premio=especie(${inKind.tag})`);
+        } else {
+          // Hay premio pero sin cifra ni tipo claro.
+          prizeSummary = prizeSummary ?? (cashy ? "Premio en efectivo" : "Con premio");
+          signals.push(`premio=${cashy ? "efectivo?" : "sí"}←"${firstHit(PRIZE_HINT, text)}"`);
+        }
       }
-      prizeSummary = prizeSummary ?? "Con premio";
     }
   }
 
@@ -118,22 +204,21 @@ export function enrichHeuristics(jam: Jam, detailText?: string): Jam {
   let aiPolicy: AiPolicy = jam.aiPolicy;
   let aiDetected = false;
   if (aiPolicy === "unknown") {
-    if (AI_BANNED.test(text)) {
-      aiPolicy = "banned";
+    const ai = detectAi(text);
+    if (ai) {
+      aiPolicy = ai.policy;
       aiDetected = true;
-    } else if (AI_ALLOWED.test(text)) {
-      aiPolicy = "allowed";
-      aiDetected = true;
+      signals.push(ai.signal);
     }
   }
 
   // --- confianza ---
   const enrichmentConfidence = hasDetail
-    ? // Ya bajamos el detalle → piso 0.8 (marca "procesada"), bonus por señales.
-      Math.min(
-        0.92,
+    ? Math.min(
+        0.95,
         Math.max(0.8, jam.enrichmentConfidence) +
           (prizeDetected ? 0.04 : 0) +
+          (cashDetected ? 0.03 : 0) +
           (aiDetected ? 0.08 : 0),
       )
     : Math.min(
@@ -152,5 +237,7 @@ export function enrichHeuristics(jam: Jam, detailText?: string): Jam {
     prizeSummary,
     aiPolicy,
     enrichmentConfidence,
+    enrichmentVersion: ENRICH_VERSION,
+    enrichmentSignals: signals.length ? signals.join("; ").slice(0, 300) : (jam.enrichmentSignals ?? null),
   };
 }

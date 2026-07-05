@@ -52,6 +52,8 @@ export const JamSchema = z.object({
   ranked: z.boolean().nullable(),
   featured: z.boolean(),
   enrichmentConfidence: z.number().min(0).max(1),
+  enrichmentVersion: z.number().optional(),
+  enrichmentSignals: z.string().nullable().optional(),
 });
 
 export type JamFromSchema = z.infer<typeof JamSchema>;
