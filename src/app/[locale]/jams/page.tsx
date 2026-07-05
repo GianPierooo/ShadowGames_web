@@ -9,12 +9,13 @@
  * filtrado (aplica los filtros sobre los datos). <FilterBar> sólo los ESCRIBE.
  *
  * Contrato de search params (fuente de verdad en src/lib/jams/filters.ts):
- *   q          texto libre           premio  "1" → hasPrize
- *   idioma     es | en | pt          ia      allowed | banned | unknown
- *   modalidad  online|in-person|hybrid   fuente  itch|devpost|ludumdare|cultura-pe
- *   orden      deadline | premio | participantes | reciente   (default: deadline)
+ *   q         texto libre             premio    "1" → hasPrize
+ *   efectivo  "1" → prizeValueUsd>0   idioma    es | en | pt
+ *   ia        allowed | banned        fuente    lista CSV (itch,devpost,…) → IN
+ *   cierra    semana | mes | todas    duracion  relampago | corta | larga
+ *   orden     deadline | premio | participantes | reciente   (default: deadline)
  *
- * Ejemplo: /es/jams?premio=1&idioma=es&ia=banned&fuente=itch&orden=deadline&q=terror
+ * Ejemplo: /es/jams?premio=1&efectivo=1&idioma=es&fuente=itch,devpost&cierra=semana
  */
 import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
@@ -27,6 +28,7 @@ import {
   parseJamFilters,
 } from "@/lib/jams/filters";
 import { queryJams } from "@/lib/jams/db";
+import { SOURCE_ORDER } from "@/lib/jams/labels";
 import { routeAlternates } from "@/lib/site";
 import { FilterBar } from "@/components/jams/FilterBar";
 import { JamGrid } from "@/components/jams/JamGrid";
@@ -92,7 +94,11 @@ export default async function JamsPage({
 
   // El server component filtra/ordena (fuente de verdad del filtrado).
   const total = source.length;
-  const jams = applyJamFilters(source, filters);
+  const jams = applyJamFilters(source, filters, now);
+
+  // Fuentes presentes en el conjunto activo (para no ofrecer chips vacíos).
+  const present = new Set(source.map((j) => j.source));
+  const availableSources = SOURCE_ORDER.filter((s) => present.has(s));
 
   const counterSub =
     activeCount > 0
@@ -120,7 +126,7 @@ export default async function JamsPage({
         </div>
       </header>
 
-      <FilterBar />
+      <FilterBar availableSources={availableSources} />
 
       <div className="pt-6">
         {jams.length === 0 ? (

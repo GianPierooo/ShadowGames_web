@@ -21,11 +21,38 @@ export async function GET(request: Request) {
     }
   }
 
+  const startedAt = new Date();
   try {
     const result = await ingestJams();
-    return NextResponse.json({ ok: true, ...result });
+    // `report` marca por fuente: número (fetched OK) o "error: …" (fallo).
+    const failedSources = Object.entries(result.report)
+      .filter(([, v]) => typeof v === "string")
+      .map(([source]) => source);
+
+    const summary = {
+      ok: true,
+      timestamp: startedAt.toISOString(),
+      durationMs: Date.now() - startedAt.getTime(),
+      hadError: failedSources.length > 0,
+      failedSources,
+      sources: result.report,
+      totalProcessed: result.totalProcessed,
+      upserted: result.upserted,
+      detail: result.detail,
+      alerts: result.alerts,
+    };
+    console.log(
+      `[cron/jams] ${summary.timestamp} · ${summary.durationMs}ms · upserted=${result.upserted} · alerts=${result.alerts.sent} · ${
+        failedSources.length ? `errores: ${failedSources.join(",")}` : "sin errores"
+      }`,
+    );
+    return NextResponse.json(summary);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+    console.error(`[cron/jams] fallo total: ${message}`);
+    return NextResponse.json(
+      { ok: false, timestamp: startedAt.toISOString(), error: message },
+      { status: 500 },
+    );
   }
 }

@@ -1,17 +1,24 @@
 "use client";
 
-import { type ChangeEvent, useCallback, useEffect, useState, useTransition } from "react";
+import {
+  type ChangeEvent,
+  useCallback,
+  useEffect,
+  useState,
+  useTransition,
+} from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import type { JamSource } from "@/lib/jams/types";
 import {
-  AI_OPTIONS,
-  LANGUAGE_OPTIONS,
-  MODE_OPTIONS,
+  DEADLINE_OPTIONS,
+  DURATION_OPTIONS,
+  LANGUAGE_BAR_OPTIONS,
   SORT_OPTIONS,
   countActiveFilters,
   parseJamFilters,
 } from "@/lib/jams/filters";
-import { SOURCE_META, SOURCE_ORDER } from "@/lib/jams/labels";
+import { SOURCE_META } from "@/lib/jams/labels";
 import { Input } from "@/components/jams/ui/Input";
 import { Select } from "@/components/jams/ui/Select";
 import { Chip, type ChipTone } from "@/components/jams/ui/Chip";
@@ -19,9 +26,19 @@ import { Button } from "@/components/jams/ui/Button";
 
 /**
  * Barra de filtros sticky. Es la única que ESCRIBE los search params
- * (la página los lee y filtra en el servidor). Nombres de params: ver page.tsx.
+ * (la página los lee y filtra en el servidor). Nombres de params: ver filters.ts.
+ *
+ * Bar principal (siempre): premio · idioma · búsqueda · orden · fuente (multi) · cierra.
+ * Panel "Más filtros" plegable: duración · premio en efectivo · política de IA.
+ *
+ * `availableSources`: fuentes con jams en el conjunto activo actual (evita mostrar
+ * chips de fuentes que saldrían vacías).
  */
-export function FilterBar() {
+export function FilterBar({
+  availableSources,
+}: {
+  availableSources: JamSource[];
+}) {
   const t = useTranslations("jams");
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -52,6 +69,13 @@ export function FilterBar() {
 
   const clearAll = useCallback(() => commit(new URLSearchParams()), [commit]);
 
+  const toggleSource = (src: JamSource) => {
+    const next = filters.fuentes.includes(src)
+      ? filters.fuentes.filter((s) => s !== src)
+      : [...filters.fuentes, src];
+    setParam("fuente", next.join(","));
+  };
+
   // --- Buscador con debounce, sincronizado con la URL ---
   const qParam = filters.q;
   const [q, setQ] = useState(qParam);
@@ -63,36 +87,53 @@ export function FilterBar() {
     return () => clearTimeout(id);
   }, [q, qParam, setParam]);
 
-  const langOptions = LANGUAGE_OPTIONS.map((c) => ({
-    value: c,
-    label: t(`language.${c}`),
-  }));
-  const aiOptions = AI_OPTIONS.map((v) => ({ value: v, label: t(`ai.${v}`) }));
-  const modeOptions = MODE_OPTIONS.map((v) => ({
-    value: v,
-    label: t(`mode.${v}`),
-  }));
-  const sourceOptions = SOURCE_ORDER.map((s) => ({
-    value: s,
-    label: SOURCE_META[s].label,
-  }));
-  const sortOptions = SORT_OPTIONS.map((v) => ({
-    value: v,
-    label: t(`sort.${v}`),
-  }));
+  // --- Panel avanzado (duración · efectivo · IA) ---
+  const advancedActive =
+    (filters.efectivo ? 1 : 0) + (filters.ia ? 1 : 0) + (filters.duracion ? 1 : 0);
+  const [advancedOpen, setAdvancedOpen] = useState(advancedActive > 0);
 
   const onSelect =
     (key: string) => (e: ChangeEvent<HTMLSelectElement>) =>
       setParam(key, e.target.value);
 
+  const langOptions = LANGUAGE_BAR_OPTIONS.map((c) => ({
+    value: c,
+    label: t(`language.${c}`),
+  }));
+  const sortOptions = SORT_OPTIONS.map((v) => ({
+    value: v,
+    label: t(`sort.${v}`),
+  }));
+  // "todas" es el valor por defecto (placeholder = sin param).
+  const cierraOptions = DEADLINE_OPTIONS.filter((v) => v !== "todas").map((v) => ({
+    value: v,
+    label: t(`cierra.${v}`),
+  }));
+  const duracionOptions = DURATION_OPTIONS.map((v) => ({
+    value: v,
+    label: t(`duracion.${v}`),
+  }));
+
   // --- Chips de filtros activos (derivados de los filtros validados) ---
-  const activeChips: { key: string; label: string; tone: ChipTone; onRemove: () => void }[] = [];
+  const activeChips: {
+    key: string;
+    label: string;
+    tone: ChipTone;
+    onRemove: () => void;
+  }[] = [];
   if (filters.premio)
     activeChips.push({
       key: "premio",
       label: t("filters.prize"),
       tone: "ember",
       onRemove: () => setParam("premio", ""),
+    });
+  if (filters.efectivo)
+    activeChips.push({
+      key: "efectivo",
+      label: t("filters.cashPrize"),
+      tone: "ember",
+      onRemove: () => setParam("efectivo", ""),
     });
   if (filters.idioma)
     activeChips.push({
@@ -101,26 +142,33 @@ export function FilterBar() {
       tone: "violet",
       onRemove: () => setParam("idioma", ""),
     });
+  if (filters.cierra !== "todas")
+    activeChips.push({
+      key: "cierra",
+      label: t(`cierra.${filters.cierra}`),
+      tone: "neutral",
+      onRemove: () => setParam("cierra", ""),
+    });
+  for (const src of filters.fuentes)
+    activeChips.push({
+      key: `fuente-${src}`,
+      label: SOURCE_META[src].label,
+      tone: "neutral",
+      onRemove: () => toggleSource(src),
+    });
+  if (filters.duracion)
+    activeChips.push({
+      key: "duracion",
+      label: t(`duracion.${filters.duracion}`),
+      tone: "neutral",
+      onRemove: () => setParam("duracion", ""),
+    });
   if (filters.ia)
     activeChips.push({
       key: "ia",
       label: t(`ai.${filters.ia}`),
       tone: filters.ia === "banned" ? "danger" : "violet",
       onRemove: () => setParam("ia", ""),
-    });
-  if (filters.modalidad)
-    activeChips.push({
-      key: "modalidad",
-      label: t(`mode.${filters.modalidad}`),
-      tone: "neutral",
-      onRemove: () => setParam("modalidad", ""),
-    });
-  if (filters.fuente)
-    activeChips.push({
-      key: "fuente",
-      label: SOURCE_META[filters.fuente].label,
-      tone: "neutral",
-      onRemove: () => setParam("fuente", ""),
     });
   if (filters.q)
     activeChips.push({
@@ -142,7 +190,7 @@ export function FilterBar() {
       aria-busy={pending}
       className="sticky top-24 z-30 -mx-5 flex flex-col gap-3 border-y border-radar-surface-2 bg-ink/85 px-5 py-4 backdrop-blur-md sm:-mx-8 sm:px-8"
     >
-      {/* fila 1: buscador · orden · limpiar */}
+      {/* fila 1: buscador · orden · limpiar · export */}
       <div className="flex flex-wrap items-center gap-2.5">
         <div className="relative min-w-[220px] flex-1">
           <SearchIcon />
@@ -184,7 +232,7 @@ export function FilterBar() {
         </div>
       </div>
 
-      {/* fila 2: controles de filtro */}
+      {/* fila 2: filtros principales */}
       <div className="flex flex-wrap items-center gap-2">
         <Chip
           tone="ember"
@@ -202,29 +250,93 @@ export function FilterBar() {
           onChange={onSelect("idioma")}
         />
         <Select
-          aria-label={t("filters.ai")}
-          placeholder={t("filters.ai")}
-          options={aiOptions}
-          value={filters.ia ?? ""}
-          onChange={onSelect("ia")}
+          aria-label={t("filters.deadline")}
+          placeholder={t("cierra.todas")}
+          options={cierraOptions}
+          value={filters.cierra === "todas" ? "" : filters.cierra}
+          onChange={onSelect("cierra")}
         />
-        <Select
-          aria-label={t("filters.mode")}
-          placeholder={t("filters.mode")}
-          options={modeOptions}
-          value={filters.modalidad ?? ""}
-          onChange={onSelect("modalidad")}
-        />
-        <Select
-          aria-label={t("filters.source")}
-          placeholder={t("filters.source")}
-          options={sourceOptions}
-          value={filters.fuente ?? ""}
-          onChange={onSelect("fuente")}
-        />
+
+        {availableSources.length > 0 && (
+          <>
+            <span
+              aria-hidden
+              className="mx-0.5 hidden h-6 w-px bg-radar-surface-2 sm:block"
+            />
+            {availableSources.map((src) => (
+              <Chip
+                key={src}
+                tone="neutral"
+                active={filters.fuentes.includes(src)}
+                onClick={() => toggleSource(src)}
+              >
+                {SOURCE_META[src].label}
+              </Chip>
+            ))}
+          </>
+        )}
+
+        <Button
+          variant="subtle"
+          className="ml-auto"
+          onClick={() => setAdvancedOpen((o) => !o)}
+          aria-expanded={advancedOpen}
+        >
+          {t("filters.more")}
+          {advancedActive > 0 && (
+            <span className="grid size-5 place-items-center rounded-full bg-ember/20 text-[11px] font-bold text-ember">
+              {advancedActive}
+            </span>
+          )}
+          <Chevron open={advancedOpen} />
+        </Button>
       </div>
 
-      {/* fila 3: chips de filtros activos */}
+      {/* panel avanzado plegable: duración · efectivo · IA */}
+      {advancedOpen && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-edge bg-radar-surface/40 px-3 py-3">
+          <Select
+            aria-label={t("filters.duration")}
+            placeholder={t("filters.duration")}
+            options={duracionOptions}
+            value={filters.duracion ?? ""}
+            onChange={onSelect("duracion")}
+          />
+          <Chip
+            tone="ember"
+            dot
+            active={filters.efectivo}
+            onClick={() => setParam("efectivo", filters.efectivo ? "" : "1")}
+          >
+            {t("filters.cashPrize")}
+          </Chip>
+          <span
+            aria-hidden
+            className="mx-0.5 hidden h-6 w-px bg-radar-surface-2 sm:block"
+          />
+          <span className="text-xs text-faint">{t("filters.aiHeading")}</span>
+          <Chip
+            tone="violet"
+            active={filters.ia === "allowed"}
+            onClick={() =>
+              setParam("ia", filters.ia === "allowed" ? "" : "allowed")
+            }
+          >
+            {t("ai.allowed")}
+          </Chip>
+          <Chip
+            tone="danger"
+            active={filters.ia === "banned"}
+            onClick={() =>
+              setParam("ia", filters.ia === "banned" ? "" : "banned")
+            }
+          >
+            {t("ai.banned")}
+          </Chip>
+        </div>
+      )}
+
+      {/* fila: chips de filtros activos */}
       {activeCount > 0 && (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-faint">{t("filters.activeLabel")}</span>
@@ -281,6 +393,25 @@ function DownloadIcon() {
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <path d="M7 10l5 5 5-5" />
       <path d="M12 15V3" />
+    </svg>
+  );
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={`flex-none transition-transform ${open ? "rotate-180" : ""}`}
+    >
+      <path d="m6 9 6 6 6-6" />
     </svg>
   );
 }

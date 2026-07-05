@@ -229,13 +229,17 @@
       "prize": "Con premio",
       "language": "Idioma",
       "ai": "Política de IA",
-      "mode": "Modalidad",
       "source": "Fuente",
       "sort": "Orden",
       "clear": "Limpiar filtros",
       "all": "Todas",
       "activeLabel": "Filtros activos",
       "remove": "Quitar filtro {label}",
+      "cashPrize": "En efectivo",
+      "deadline": "Cierra",
+      "duration": "Duración",
+      "more": "Más filtros",
+      "aiHeading": "Política de IA",
       "exportIcal": "Exportar iCal",
       "exportCsv": "Exportar CSV"
     },
@@ -244,6 +248,16 @@
       "premio": "Premio más alto",
       "participantes": "Más participantes",
       "reciente": "Añadidas recientemente"
+    },
+    "cierra": {
+      "semana": "Cierra esta semana",
+      "mes": "Cierra este mes",
+      "todas": "Todas las abiertas"
+    },
+    "duracion": {
+      "relampago": "Relámpago · ≤48 h",
+      "corta": "Corta · 2–7 días",
+      "larga": "Larga · +7 días"
     },
     "language": {
       "es": "Español",

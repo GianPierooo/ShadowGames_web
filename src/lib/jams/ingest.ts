@@ -11,7 +11,9 @@ import {
 import { fetchItchDetail } from "./sources/itch-detail";
 import {
   ALERT_MAX_PER_RUN,
+  ALERT_ON_ERROR,
   isDiscordConfigured,
+  sendHealthAlert,
   sendJamAlerts,
 } from "./notify/discord";
 
@@ -178,5 +180,18 @@ export async function ingestJams(): Promise<IngestResult> {
   console.log(
     `[ingest] fuentes=${JSON.stringify(report)} procesadas=${pass2.jams.length} upserted=${upserted} detalle=${JSON.stringify(result.detail)} alertas=${JSON.stringify(alerts)}`,
   );
+
+  // Aviso de salud: solo si alguna fuente falló (no en cada corrida).
+  const failedSources = Object.entries(report)
+    .filter(([, v]) => typeof v === "string")
+    .map(([source]) => source);
+  if (ALERT_ON_ERROR && failedSources.length > 0) {
+    await sendHealthAlert(report, {
+      upserted,
+      alertsSent: alerts.sent,
+      failedSources,
+    }).catch(() => {});
+  }
+
   return result;
 }

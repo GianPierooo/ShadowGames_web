@@ -109,3 +109,51 @@ export async function sendJamAlerts(jams: Jam[]): Promise<Jam[]> {
   }
   return sent;
 }
+
+// ---------------------------------------------------------------------------
+// Alerta de SALUD (solo cuando alguna fuente falla, no en cada corrida)
+// ---------------------------------------------------------------------------
+
+/** Si true, manda un aviso al Discord cuando la ingesta tuvo errores de fuente. */
+export const ALERT_ON_ERROR = true;
+
+/**
+ * Aviso de salud a Discord: un ÚNICO mensaje de resumen, y SOLO si hubo error en
+ * alguna fuente. No lanza (los fallos se tragan con log). Devuelve si se envió.
+ */
+export async function sendHealthAlert(
+  report: Record<string, number | string>,
+  summary: { upserted: number; alertsSent: number; failedSources: string[] },
+): Promise<boolean> {
+  const url = process.env.DISCORD_WEBHOOK_URL;
+  if (!url || summary.failedSources.length === 0) return false;
+
+  const lines = Object.entries(report).map(([source, v]) =>
+    typeof v === "number" ? `✅ ${source}: ${v}` : `❌ ${source}: ${v}`,
+  );
+  const content = [
+    `⚠️ **Radar de Jams — ingesta con errores** (${summary.failedSources.length} fuente(s): ${summary.failedSources.join(", ")})`,
+    ...lines,
+    `upserted=${summary.upserted} · alertas enviadas=${summary.alertsSent}`,
+  ]
+    .join("\n")
+    .slice(0, 1900);
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ username: "Radar de Jams · salud", content }),
+    });
+    if (!res.ok) {
+      console.warn(`[discord] aviso de salud respondió ${res.status}`);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn(
+      `[discord] aviso de salud falló: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return false;
+  }
+}
