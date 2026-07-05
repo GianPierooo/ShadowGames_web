@@ -64,4 +64,15 @@ export interface Jam {
   featured: boolean;
   /** Confianza del enriquecimiento automático (0..1). */
   enrichmentConfidence: number;
+  /**
+   * Versión de las heurísticas con las que se enriqueció. Permite invalidar el
+   * caché (reprocesar el detalle una vez) cuando se mejoran las reglas. Opcional:
+   * los adapters no la fijan; la estampa `enrichHeuristics`.
+   */
+  enrichmentVersion?: number;
+  /**
+   * Auditoría legible de qué señal disparó cada decisión (premio/IA/idioma), p.ej.
+   * "ia=banned←'no ai'; premio=cash $5000←'$5,000'". Opcional; sólo para depurar.
+   */
+  enrichmentSignals?: string | null;
 }

@@ -63,12 +63,14 @@ export async function upsertJams(jams: Jam[]): Promise<number> {
           source, source_id, url, title, hosts,
           start_at, end_at, duration_days, theme, tags, languages,
           has_prize, prize_summary, prize_value_usd, ai_policy, mode,
-          participants, country, ranked, featured, enrichment_confidence, raw
+          participants, country, ranked, featured, enrichment_confidence,
+          enrichment_version, enrichment_signals, raw
         ) values (
           ${j.source}, ${j.sourceId}, ${j.url}, ${j.title}, ${toJson(j.hosts)},
           ${j.startAt}, ${j.endAt}, ${j.durationDays}, ${j.theme}, ${j.tags}::text[], ${j.languages}::text[],
           ${j.hasPrize}, ${j.prizeSummary}, ${j.prizeValueUsd}, ${j.aiPolicy}, ${j.mode},
-          ${j.participants}, ${j.country}, ${j.ranked}, ${j.featured}, ${j.enrichmentConfidence}, ${toJson(j)}
+          ${j.participants}, ${j.country}, ${j.ranked}, ${j.featured}, ${j.enrichmentConfidence},
+          ${j.enrichmentVersion ?? 0}, ${j.enrichmentSignals ?? null}, ${toJson(j)}
         )
         on conflict (source, source_id) do update set
           url                   = excluded.url,
@@ -90,6 +92,8 @@ export async function upsertJams(jams: Jam[]): Promise<number> {
           ranked                = excluded.ranked,
           featured              = excluded.featured,
           enrichment_confidence = excluded.enrichment_confidence,
+          enrichment_version    = excluded.enrichment_version,
+          enrichment_signals    = excluded.enrichment_signals,
           raw                   = excluded.raw,
           last_seen_at          = now()
       `;
@@ -246,6 +250,9 @@ export interface PersistedEnrichment {
   prizeValueUsd: number | null;
   languages: string[];
   enrichmentConfidence: number;
+  /** Versión de heurística con la que se enriqueció (para invalidar caché). */
+  enrichmentVersion: number;
+  enrichmentSignals: string | null;
 }
 
 /**
@@ -257,21 +264,23 @@ export async function getPersistedEnrichment(): Promise<
 > {
   const sql = getSql();
   const rows = await sql<
-    Pick<
-      JamRow,
-      | "source"
-      | "source_id"
-      | "ai_policy"
-      | "theme"
-      | "has_prize"
-      | "prize_summary"
-      | "prize_value_usd"
-      | "languages"
-      | "enrichment_confidence"
-    >[]
+    {
+      source: string;
+      source_id: string;
+      ai_policy: string;
+      theme: string | null;
+      has_prize: boolean | null;
+      prize_summary: string | null;
+      prize_value_usd: number | null;
+      languages: string[] | null;
+      enrichment_confidence: number;
+      enrichment_version: number;
+      enrichment_signals: string | null;
+    }[]
   >`
     select source, source_id, ai_policy, theme, has_prize,
-           prize_summary, prize_value_usd, languages, enrichment_confidence
+           prize_summary, prize_value_usd, languages, enrichment_confidence,
+           enrichment_version, enrichment_signals
     from radar.jams
   `;
 
@@ -285,6 +294,8 @@ export async function getPersistedEnrichment(): Promise<
       prizeValueUsd: r.prize_value_usd,
       languages: r.languages ?? [],
       enrichmentConfidence: r.enrichment_confidence,
+      enrichmentVersion: r.enrichment_version ?? 0,
+      enrichmentSignals: r.enrichment_signals,
     });
   }
   return map;
