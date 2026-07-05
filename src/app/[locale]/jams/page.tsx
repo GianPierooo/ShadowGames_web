@@ -96,9 +96,9 @@ export default async function JamsPage({
   const total = source.length;
   const jams = applyJamFilters(source, filters, now);
 
-  // Fuentes presentes en el conjunto activo (para no ofrecer chips vacíos).
-  const present = new Set(source.map((j) => j.source));
-  const availableSources = SOURCE_ORDER.filter((s) => present.has(s));
+  // El bar ofrece TODAS las fuentes registradas (las 7), aunque alguna no tenga
+  // jams vigentes ahora mismo: seleccionar una vacía muestra el estado vacío.
+  const availableSources = SOURCE_ORDER;
 
   const counterSub =
     activeCount > 0
