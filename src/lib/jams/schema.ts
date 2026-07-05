@@ -23,7 +23,15 @@ export const JamHostSchema = z.object({
 });
 
 export const JamSchema = z.object({
-  source: z.enum(["itch", "devpost", "ludumdare", "cultura-pe", "cva-pe"]),
+  source: z.enum([
+    "itch",
+    "devpost",
+    "ludumdare",
+    "alakajam",
+    "globalgamejam",
+    "cultura-pe",
+    "cva-pe",
+  ]),
   sourceId: z.string().min(1),
   url: httpUrl,
   title: z.string().min(1),

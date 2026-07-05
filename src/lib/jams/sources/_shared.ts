@@ -3,6 +3,7 @@
  * User-Agent identificable + fetch con manejo de errores + helpers puros de fecha/conteo.
  * Sin dependencias de la UI ni de red persistente.
  */
+import { request as httpsRequest } from "node:https";
 
 export const USER_AGENT =
   "ShadowGamesJamRadar/0.1 (+https://shadowgames.studio; contacto@shadowgames.studio)";
@@ -53,6 +54,61 @@ export async function fetchText(url: string, opts?: FetchOptions): Promise<strin
 export async function fetchJson<T>(url: string, opts?: FetchOptions): Promise<T> {
   const res = await doFetch(url, "application/json,text/plain,*/*", opts);
   return (await res.json()) as T;
+}
+
+/**
+ * GET tolerante a certificados TLS inválidos (p. ej. cert VENCIDO de Ludum Dare).
+ * Usa node:https con rejectUnauthorized:false — mantiene SNI/Host correctos (al
+ * contrario que `curl -k`). SÓLO para APIs PÚBLICAS de solo-lectura, sin secretos
+ * (no se envían credenciales). Lanza en !2xx / error / timeout.
+ */
+export function fetchInsecureText(url: string, opts: FetchOptions = {}): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch (e) {
+      reject(e as Error);
+      return;
+    }
+    const req = httpsRequest(
+      {
+        hostname: parsed.hostname,
+        path: parsed.pathname + parsed.search,
+        method: "GET",
+        headers: {
+          "user-agent": USER_AGENT,
+          accept: "application/json,text/plain,*/*",
+          ...opts.headers,
+        },
+        rejectUnauthorized: false,
+        timeout: opts.timeoutMs ?? 15000,
+      },
+      (res) => {
+        const code = res.statusCode ?? 0;
+        if (code < 200 || code >= 300) {
+          res.resume();
+          reject(new Error(`GET ${url} → ${code}`));
+          return;
+        }
+        let data = "";
+        res.setEncoding("utf8");
+        res.on("data", (c) => (data += c));
+        res.on("end", () => resolve(data));
+      },
+    );
+    req.on("error", reject);
+    req.on("timeout", () => {
+      req.destroy();
+      reject(new Error(`GET ${url} → timeout`));
+    });
+    req.end();
+  });
+}
+
+/** JSON vía `fetchInsecureText` (TLS laxo). Lanza si no parsea o !2xx. */
+export async function fetchInsecureJson<T>(url: string, opts?: FetchOptions): Promise<T> {
+  return JSON.parse(await fetchInsecureText(url, opts)) as T;
 }
 
 // ---------------------------------------------------------------------------

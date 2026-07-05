@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "press:zip": "node scripts/build-press-zip.mjs"
+    "press:zip": "node scripts/build-press-zip.mjs",
+    "test:adapters": "tsx scripts/test-adapters.ts",
+    "ingest:once": "tsx scripts/ingest-once.ts",
+    "query:jams": "tsx scripts/query-jams.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -43,11 +46,13 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "adm-zip": "^0.5.17",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.0",
     "typescript": "^5"
   }
 }
