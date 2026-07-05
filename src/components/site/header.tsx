@@ -14,6 +14,7 @@ import { cn } from "@/lib/cn";
 
 const NAV_ITEMS = [
   { href: "/juegos", key: "games" },
+  { href: "/jams", key: "radar" },
   { href: "/estudio", key: "studio" },
   { href: "/press", key: "press" },
   { href: "/contacto", key: "contact" },

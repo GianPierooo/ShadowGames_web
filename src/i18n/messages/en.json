@@ -10,7 +10,7 @@
   "Nav": {
     "home": "Inicio",
     "games": "Juegos",
-    "radar": "Radar de Jams",
+    "radar": "Jam Radar",
     "studio": "Estudio",
     "press": "Press",
     "contact": "Contacto",
@@ -37,10 +37,10 @@
     "communityBody": "Discord activo, novedades primero, betas y arte exclusivo.",
     "communityCtaDiscord": "Entrar al Discord",
     "communityCtaFollow": "Síguenos",
-    "radarEyebrow": "Radar de Jams",
-    "radarTitle": "Todas las game jams, en un solo lugar",
-    "radarBody": "itch.io, Devpost, Ludum Dare y convocatorias de Latinoamérica — con filtros por premio, idioma y política de IA.",
-    "radarCta": "Explorar el radar"
+    "radarEyebrow": "Jam Radar",
+    "radarTitle": "Every game jam, in one place",
+    "radarBody": "itch.io, Devpost, Ludum Dare and open calls from Latin America — filter by prize, language and AI policy.",
+    "radarCta": "Explore the radar"
   },
   "Games": {
     "eyebrow": "Catálogo",
@@ -214,75 +214,75 @@
     "reviewNote": "Esta página es un borrador pendiente de revisión legal."
   },
   "jams": {
-    "title": "Radar de Jams",
-    "subtitle": "Todas las game jams en un solo radar — itch.io, Devpost, Ludum Dare y convocatorias de Latinoamérica.",
+    "title": "Jam Radar",
+    "subtitle": "Every game jam on a single radar — itch.io, Devpost, Ludum Dare and calls from Latin America.",
     "header": {
-      "ofJams": "de {total} jams",
-      "filtersActive": "{count, plural, one {# filtro} other {# filtros}}",
-      "noFilters": "sin filtros"
+      "ofJams": "of {total} jams",
+      "filtersActive": "{count, plural, one {# filter} other {# filters}}",
+      "noFilters": "no filters"
     },
     "search": {
-      "placeholder": "Buscar por nombre, tema o host…",
-      "label": "Buscar jams"
+      "placeholder": "Search by name, theme or host…",
+      "label": "Search jams"
     },
     "filters": {
-      "prize": "Con premio",
-      "language": "Idioma",
-      "ai": "Política de IA",
-      "mode": "Modalidad",
-      "source": "Fuente",
-      "sort": "Orden",
-      "clear": "Limpiar filtros",
-      "all": "Todas",
-      "activeLabel": "Filtros activos",
-      "remove": "Quitar filtro {label}",
-      "exportIcal": "Exportar iCal",
-      "exportCsv": "Exportar CSV"
+      "prize": "With prize",
+      "language": "Language",
+      "ai": "AI policy",
+      "mode": "Mode",
+      "source": "Source",
+      "sort": "Sort",
+      "clear": "Clear filters",
+      "all": "All",
+      "activeLabel": "Active filters",
+      "remove": "Remove filter {label}",
+      "exportIcal": "Export iCal",
+      "exportCsv": "Export CSV"
     },
     "sort": {
-      "deadline": "Deadline más próximo",
-      "premio": "Premio más alto",
-      "participantes": "Más participantes",
-      "reciente": "Añadidas recientemente"
+      "deadline": "Closest deadline",
+      "premio": "Highest prize",
+      "participantes": "Most participants",
+      "reciente": "Recently added"
     },
     "language": {
-      "es": "Español",
-      "en": "Inglés",
-      "pt": "Portugués"
+      "es": "Spanish",
+      "en": "English",
+      "pt": "Portuguese"
     },
     "ai": {
-      "allowed": "IA permitida",
-      "banned": "IA prohibida",
-      "unknown": "IA sin definir"
+      "allowed": "AI allowed",
+      "banned": "AI banned",
+      "unknown": "AI undefined"
     },
     "mode": {
       "online": "Online",
-      "in-person": "Presencial",
-      "hybrid": "Híbrida",
-      "unknown": "Sin definir"
+      "in-person": "In person",
+      "hybrid": "Hybrid",
+      "unknown": "Undefined"
     },
     "card": {
-      "closesInHours": "{count, plural, one {Cierra en # hora} other {Cierra en # horas}}",
-      "closesInDays": "{count, plural, one {Cierra en # día} other {Cierra en # días}}",
-      "closed": "Cerrada",
-      "ongoing": "En curso",
+      "closesInHours": "{count, plural, one {Closes in # hour} other {Closes in # hours}}",
+      "closesInDays": "{count, plural, one {Closes in # day} other {Closes in # days}}",
+      "closed": "Closed",
+      "ongoing": "Live",
       "deadlineOn": "Deadline {date}",
-      "onlyDeadline": "Solo deadline",
-      "noStart": "sin fecha de inicio",
-      "datesTbd": "Fechas por confirmar",
-      "participants": "{count, plural, one {# participante} other {# participantes}}",
-      "by": "por {name}",
-      "fundedEyebrow": "Convocatoria cultural · Financiamiento",
-      "themeLabel": "Tema: {theme}",
-      "viewSource": "Ver en la fuente"
+      "onlyDeadline": "Deadline only",
+      "noStart": "no start date",
+      "datesTbd": "Dates TBC",
+      "participants": "{count, plural, one {# participant} other {# participants}}",
+      "by": "by {name}",
+      "fundedEyebrow": "Cultural call · Funding",
+      "themeLabel": "Theme: {theme}",
+      "viewSource": "View on source"
     },
     "empty": {
-      "title": "Sin jams en el radar",
-      "body": "Ninguna jam coincide con estos filtros. Prueba ampliar el idioma o quitar «Con premio».",
-      "action": "Limpiar filtros"
+      "title": "No jams on the radar",
+      "body": "No jam matches these filters. Try widening the language or removing “With prize”.",
+      "action": "Clear filters"
     },
     "loading": {
-      "label": "Cargando jams…"
+      "label": "Loading jams…"
     }
   }
 }

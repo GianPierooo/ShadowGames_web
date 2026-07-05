@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/home/hero";
 import { FeaturedGames } from "@/components/home/featured-games";
+import { RadarTeaser } from "@/components/home/radar-teaser";
 import { StudioSection } from "@/components/home/studio-section";
 import { MerchSection } from "@/components/home/merch-section";
 import { CommunityBanner } from "@/components/home/community-banner";
@@ -28,6 +29,7 @@ export default async function HomePage({ params }: HomePageProps) {
     <>
       <Hero />
       <FeaturedGames />
+      <RadarTeaser />
       <StudioSection />
       <MerchSection />
       <CommunityBanner />
