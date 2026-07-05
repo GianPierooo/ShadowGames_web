@@ -9,5 +9,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
   return {
     locale,
     messages: (await import(`./messages/${locale}.json`)).default,
+    // Zona horaria fija: fechas estables en servidor y cliente (evita
+    // corrimientos de día e hidratación inconsistente en el Radar de Jams).
+    timeZone: "UTC",
   };
 });
