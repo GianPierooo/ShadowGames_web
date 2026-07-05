@@ -103,10 +103,14 @@ export async function JamCard({ jam, now }: { jam: Jam; now: Date }) {
         </p>
       )}
 
-      {/* fila superior: fuente + política de IA */}
+      {/* fila superior: fuente + política de IA.
+          El chip de IA sólo informa cuando permite/prohíbe; con "unknown" (la
+          mayoría) no aporta y añade ruido, así que se omite. */}
       <div className="flex items-center justify-between gap-2.5">
         <SourceBadge source={jam.source} />
-        <AiChip policy={jam.aiPolicy} label={t(`ai.${jam.aiPolicy}`)} />
+        {jam.aiPolicy !== "unknown" && (
+          <AiChip policy={jam.aiPolicy} label={t(`ai.${jam.aiPolicy}`)} />
+        )}
       </div>
 
       <h3 className="font-display text-[21px] font-semibold leading-[1.16] tracking-[-0.01em] text-radar-text text-pretty">

@@ -244,7 +244,13 @@
       "team": "Participation",
       "ranked": "Ranked",
       "exportIcal": "Export iCal",
-      "exportCsv": "Export CSV"
+      "exportCsv": "Export CSV",
+      "sourceWithCount": "Source · {count}",
+      "sourceAll": "All sources",
+      "groupFormat": "Format",
+      "groupRequirements": "Requirements",
+      "groupPrize": "Prize",
+      "close": "Close"
     },
     "sort": {
       "deadline": "Closest deadline",

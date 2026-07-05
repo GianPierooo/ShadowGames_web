@@ -244,7 +244,13 @@
       "team": "Participación",
       "ranked": "Con ranking",
       "exportIcal": "Exportar iCal",
-      "exportCsv": "Exportar CSV"
+      "exportCsv": "Exportar CSV",
+      "sourceWithCount": "Fuente · {count}",
+      "sourceAll": "Todas las fuentes",
+      "groupFormat": "Formato",
+      "groupRequirements": "Requisitos",
+      "groupPrize": "Premio",
+      "close": "Cerrar"
     },
     "sort": {
       "deadline": "Deadline más próximo",
