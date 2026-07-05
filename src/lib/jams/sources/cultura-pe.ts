@@ -13,6 +13,14 @@ const PAGE_URL =
 
 export async function fetchCulturaPeJams(): Promise<Jam[]> {
   const html = await fetchText(PAGE_URL);
+  return parseCulturaPe(html);
+}
+
+/**
+ * Parsea el HTML de Cultura PE a Jam[] (función PURA, sin red → testeable con
+ * fixtures). `nowMs` inyectable para deterministas (default: ahora).
+ */
+export function parseCulturaPe(html: string, nowMs: number = Date.now()): Jam[] {
   const $ = cheerio.load(html);
   const bySlug = new Map<string, Jam>();
 
@@ -29,7 +37,7 @@ export async function fetchCulturaPeJams(): Promise<Jam[]> {
     if (!endAt) return;
 
     // Abierto: lo dice el estado, o el cierre aún no pasó (no mostramos cerrados).
-    if (!/abierto/i.test(text) && Date.parse(endAt) < Date.now()) return;
+    if (!/abierto/i.test(text) && Date.parse(endAt) < nowMs) return;
 
     const slug = href.match(/\/concursos\/([^/?#]+)/)?.[1] ?? href;
     if (bySlug.has(slug)) return;

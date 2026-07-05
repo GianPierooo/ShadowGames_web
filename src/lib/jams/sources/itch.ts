@@ -22,7 +22,7 @@ export async function fetchItchJams(): Promise<Jam[]> {
   for (const page of PAGES) {
     try {
       const html = await fetchText(page.url);
-      for (const jam of parseListing(html, page.phase)) {
+      for (const jam of parseItchList(html, page.phase)) {
         // dedup por slug (una jam puede colarse en ambas páginas)
         if (!bySlug.has(jam.sourceId)) bySlug.set(jam.sourceId, jam);
       }
@@ -38,7 +38,14 @@ export async function fetchItchJams(): Promise<Jam[]> {
   return [...bySlug.values()];
 }
 
-function parseListing(html: string, phase: "upcoming" | "in-progress"): Jam[] {
+/**
+ * Parsea el HTML del listado de itch a Jam[] (función PURA, sin red → testeable
+ * con fixtures). `fetchItchJams` la llama tras descargar cada página.
+ */
+export function parseItchList(
+  html: string,
+  phase: "upcoming" | "in-progress" = "upcoming",
+): Jam[] {
   const $ = cheerio.load(html);
   const out: Jam[] = [];
 
