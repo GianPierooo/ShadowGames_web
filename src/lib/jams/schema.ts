@@ -54,6 +54,8 @@ export const JamSchema = z.object({
   enrichmentConfidence: z.number().min(0).max(1),
   enrichmentVersion: z.number().optional(),
   enrichmentSignals: z.string().nullable().optional(),
+  engine: z.string().nullable().optional(),
+  teamPolicy: z.enum(["solo", "team", "both"]).nullable().optional(),
 });
 
 export type JamFromSchema = z.infer<typeof JamSchema>;

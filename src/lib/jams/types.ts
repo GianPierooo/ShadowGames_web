@@ -20,6 +20,9 @@ export type AiPolicy = "allowed" | "banned" | "unknown";
 /** Modalidad de participación. */
 export type JamMode = "online" | "in-person" | "hybrid" | "unknown";
 
+/** Política de participación en solitario / equipo. */
+export type TeamPolicy = "solo" | "team" | "both";
+
 /** Organizador/host de la jam. */
 export interface JamHost {
   name: string;
@@ -75,4 +78,8 @@ export interface Jam {
    * "ia=banned←'no ai'; premio=cash $5000←'$5,000'". Opcional; sólo para depurar.
    */
   enrichmentSignals?: string | null;
+  /** Motor/tecnología detectado (godot, unity, unreal, …) o null. */
+  engine?: string | null;
+  /** Política solo/equipo detectada, o null si no hay señal. */
+  teamPolicy?: TeamPolicy | null;
 }

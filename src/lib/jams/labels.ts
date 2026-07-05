@@ -35,3 +35,27 @@ export const SOURCE_ORDER: JamSource[] = [
   "cultura-pe",
   "cva-pe",
 ];
+
+/**
+ * Etiqueta visible por motor/engine (id canónico → marca). Los ids los produce
+ * `enrich.ts` (detectEngine). Son marcas, por eso no se traducen. El orden fija
+ * la prioridad de detección y el orden de los chips en el filtro.
+ */
+export const ENGINE_LABEL: Record<string, string> = {
+  godot: "Godot",
+  unity: "Unity",
+  unreal: "Unreal",
+  gamemaker: "GameMaker",
+  rpgmaker: "RPG Maker",
+  construct: "Construct",
+  renpy: "Ren'Py",
+  twine: "Twine",
+  bitsy: "Bitsy",
+  pico8: "PICO-8",
+  phaser: "Phaser",
+  love2d: "LÖVE",
+  html5: "HTML5",
+};
+
+/** Orden estable de motores para el filtro (los que no existan en datos no se listan). */
+export const ENGINE_ORDER: string[] = Object.keys(ENGINE_LABEL);

@@ -15,10 +15,11 @@ import {
   DURATION_OPTIONS,
   LANGUAGE_BAR_OPTIONS,
   SORT_OPTIONS,
+  TEAM_OPTIONS,
   countActiveFilters,
   parseJamFilters,
 } from "@/lib/jams/filters";
-import { SOURCE_META } from "@/lib/jams/labels";
+import { ENGINE_LABEL, SOURCE_META } from "@/lib/jams/labels";
 import { Input } from "@/components/jams/ui/Input";
 import { Select } from "@/components/jams/ui/Select";
 import { Chip, type ChipTone } from "@/components/jams/ui/Chip";
@@ -36,8 +37,10 @@ import { Button } from "@/components/jams/ui/Button";
  */
 export function FilterBar({
   availableSources,
+  availableEngines,
 }: {
   availableSources: JamSource[];
+  availableEngines: string[];
 }) {
   const t = useTranslations("jams");
   const searchParams = useSearchParams();
@@ -76,6 +79,13 @@ export function FilterBar({
     setParam("fuente", next.join(","));
   };
 
+  const toggleEngine = (eng: string) => {
+    const next = filters.motores.includes(eng)
+      ? filters.motores.filter((e) => e !== eng)
+      : [...filters.motores, eng];
+    setParam("motor", next.join(","));
+  };
+
   // --- Buscador con debounce, sincronizado con la URL ---
   const qParam = filters.q;
   const [q, setQ] = useState(qParam);
@@ -87,9 +97,13 @@ export function FilterBar({
     return () => clearTimeout(id);
   }, [q, qParam, setParam]);
 
-  // --- Panel avanzado (duración · efectivo · IA) ---
+  // --- Panel avanzado (duración · efectivo · IA · equipo · ranked) ---
   const advancedActive =
-    (filters.efectivo ? 1 : 0) + (filters.ia ? 1 : 0) + (filters.duracion ? 1 : 0);
+    (filters.efectivo ? 1 : 0) +
+    (filters.ia ? 1 : 0) +
+    (filters.duracion ? 1 : 0) +
+    (filters.equipo ? 1 : 0) +
+    (filters.ranked ? 1 : 0);
   const [advancedOpen, setAdvancedOpen] = useState(advancedActive > 0);
 
   const onSelect =
@@ -112,6 +126,10 @@ export function FilterBar({
   const duracionOptions = DURATION_OPTIONS.map((v) => ({
     value: v,
     label: t(`duracion.${v}`),
+  }));
+  const teamOptions = TEAM_OPTIONS.map((v) => ({
+    value: v,
+    label: t(`equipo.${v}`),
   }));
 
   // --- Chips de filtros activos (derivados de los filtros validados) ---
@@ -169,6 +187,27 @@ export function FilterBar({
       label: t(`ai.${filters.ia}`),
       tone: filters.ia === "banned" ? "danger" : "violet",
       onRemove: () => setParam("ia", ""),
+    });
+  for (const eng of filters.motores)
+    activeChips.push({
+      key: `motor-${eng}`,
+      label: ENGINE_LABEL[eng] ?? eng,
+      tone: "violet",
+      onRemove: () => toggleEngine(eng),
+    });
+  if (filters.equipo)
+    activeChips.push({
+      key: "equipo",
+      label: t(`equipo.${filters.equipo}`),
+      tone: "neutral",
+      onRemove: () => setParam("equipo", ""),
+    });
+  if (filters.ranked)
+    activeChips.push({
+      key: "ranked",
+      label: t("filters.ranked"),
+      tone: "neutral",
+      onRemove: () => setParam("ranked", ""),
     });
   if (filters.q)
     activeChips.push({
@@ -292,7 +331,24 @@ export function FilterBar({
         </Button>
       </div>
 
-      {/* panel avanzado plegable: duración · efectivo · IA */}
+      {/* fila motor: multi-chips por engine (solo los presentes en los datos) */}
+      {availableEngines.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-faint">{t("filters.engine")}</span>
+          {availableEngines.map((eng) => (
+            <Chip
+              key={eng}
+              tone="violet"
+              active={filters.motores.includes(eng)}
+              onClick={() => toggleEngine(eng)}
+            >
+              {ENGINE_LABEL[eng] ?? eng}
+            </Chip>
+          ))}
+        </div>
+      )}
+
+      {/* panel avanzado plegable: duración · efectivo · IA · equipo · ranked */}
       {advancedOpen && (
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-edge bg-radar-surface/40 px-3 py-3">
           <Select
@@ -332,6 +388,25 @@ export function FilterBar({
             }
           >
             {t("ai.banned")}
+          </Chip>
+          <span
+            aria-hidden
+            className="mx-0.5 hidden h-6 w-px bg-radar-surface-2 sm:block"
+          />
+          <Select
+            aria-label={t("filters.team")}
+            placeholder={t("filters.team")}
+            options={teamOptions}
+            value={filters.equipo ?? ""}
+            onChange={onSelect("equipo")}
+          />
+          <Chip
+            tone="neutral"
+            dot
+            active={filters.ranked}
+            onClick={() => setParam("ranked", filters.ranked ? "" : "1")}
+          >
+            {t("filters.ranked")}
           </Chip>
         </div>
       )}

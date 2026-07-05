@@ -1,4 +1,5 @@
-import type { Jam, JamSource } from "./types";
+import type { Jam, JamSource, TeamPolicy } from "./types";
+import { ENGINE_ORDER } from "./labels";
 
 /**
  * Parseo + aplicación de filtros. ÚNICA fuente de verdad de:
@@ -14,10 +15,12 @@ import type { Jam, JamSource } from "./types";
  *   fuente     lista CSV, p.ej. itch,devpost,cultura-pe   → pertenencia (IN)
  *   cierra     semana | mes | todas       (ventana de deadline; default: todas)
  *   duracion   relampago | corta | larga  (≤48 h / 2–7 días / >7 días)
+ *   motor      lista CSV, p.ej. godot,unity   → engine ∈ conjunto (IN)
+ *   equipo     solo | team | both             (política de participación)
+ *   ranked     "1"                            → jam con ranking
  *   orden      deadline | premio | participantes | reciente   (default: deadline)
  *
- * TODO (fase futura — datos aún incompletos; no se exponen para no salir vacíos):
- *   solo/equipo (tamaño de equipo), ranked (jam.ranked), motor/tema (engine/theme).
+ * TODO (fase futura — datos aún incompletos): tema (theme) como filtro.
  */
 export type JamSort = "deadline" | "premio" | "participantes" | "reciente";
 export type DeadlineWindow = "semana" | "mes" | "todas";
@@ -32,6 +35,9 @@ export interface JamFilters {
   idioma: string | null;
   ia: AiFilter | null;
   fuentes: JamSource[];
+  motores: string[];
+  equipo: TeamPolicy | null;
+  ranked: boolean;
   cierra: DeadlineWindow;
   duracion: DurationBucket | null;
   orden: JamSort;
@@ -46,6 +52,7 @@ export const SORT_OPTIONS: JamSort[] = [
 export const AI_FILTER_OPTIONS: AiFilter[] = ["allowed", "banned"];
 export const DEADLINE_OPTIONS: DeadlineWindow[] = ["semana", "mes", "todas"];
 export const DURATION_OPTIONS: DurationBucket[] = ["relampago", "corta", "larga"];
+export const TEAM_OPTIONS: TeamPolicy[] = ["solo", "team", "both"];
 /** Idiomas que se pueden filtrar. La barra destaca es/en; pt sigue siendo válido por URL. */
 export const LANGUAGE_OPTIONS = ["es", "en", "pt"] as const;
 /** Idiomas ofrecidos en la barra (destacados). */
@@ -88,6 +95,17 @@ export function parseSources(value: string | undefined): JamSource[] {
   return [...seen];
 }
 
+/** Parsea la lista CSV de motores (?motor=godot,unity): valida contra ENGINE_ORDER. */
+export function parseEngines(value: string | undefined): string[] {
+  if (!value) return [];
+  const seen = new Set<string>();
+  for (const raw of value.split(",")) {
+    const s = raw.trim().toLowerCase();
+    if (ENGINE_ORDER.includes(s)) seen.add(s);
+  }
+  return [...seen];
+}
+
 /** Lee los search params y devuelve un objeto de filtros normalizado y validado. */
 export function parseJamFilters(sp: RawSearchParams): JamFilters {
   return {
@@ -97,6 +115,9 @@ export function parseJamFilters(sp: RawSearchParams): JamFilters {
     idioma: coerce(one(sp.idioma), LANGUAGE_OPTIONS),
     ia: coerce(one(sp.ia), AI_FILTER_OPTIONS),
     fuentes: parseSources(one(sp.fuente)),
+    motores: parseEngines(one(sp.motor)),
+    equipo: coerce(one(sp.equipo), TEAM_OPTIONS),
+    ranked: one(sp.ranked) === "1",
     cierra: coerce(one(sp.cierra), DEADLINE_OPTIONS) ?? "todas",
     duracion: coerce(one(sp.duracion), DURATION_OPTIONS),
     orden: coerce(one(sp.orden), SORT_OPTIONS) ?? "deadline",
@@ -112,6 +133,9 @@ export function countActiveFilters(f: JamFilters): number {
   if (f.idioma) n++;
   if (f.ia) n++;
   n += f.fuentes.length;
+  n += f.motores.length;
+  if (f.equipo) n++;
+  if (f.ranked) n++;
   if (f.cierra !== "todas") n++;
   if (f.duracion) n++;
   return n;
@@ -158,6 +182,10 @@ function matches(jam: Jam, f: JamFilters, q: string, nowMs: number): boolean {
   if (f.idioma && !jam.languages.includes(f.idioma)) return false;
   if (f.ia && jam.aiPolicy !== f.ia) return false;
   if (f.fuentes.length && !f.fuentes.includes(jam.source)) return false;
+  if (f.motores.length && !(jam.engine != null && f.motores.includes(jam.engine)))
+    return false;
+  if (f.equipo && jam.teamPolicy !== f.equipo) return false;
+  if (f.ranked && jam.ranked !== true) return false;
   if (!matchesDeadline(jam, f.cierra, nowMs)) return false;
   if (f.duracion && !matchesDuration(jam, f.duracion)) return false;
   if (q) {

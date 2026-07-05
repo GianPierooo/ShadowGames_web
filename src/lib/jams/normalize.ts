@@ -64,6 +64,8 @@ function mergeJams(a: Jam, b: Jam): Jam {
     country: pick(primary.country, secondary.country),
     ranked: primary.ranked != null ? primary.ranked : secondary.ranked,
     aiPolicy: primary.aiPolicy !== "unknown" ? primary.aiPolicy : secondary.aiPolicy,
+    engine: pick(primary.engine ?? null, secondary.engine ?? null),
+    teamPolicy: pick(primary.teamPolicy ?? null, secondary.teamPolicy ?? null),
     tags: uniq([...primary.tags, ...secondary.tags]),
     languages: uniq([...primary.languages, ...secondary.languages]),
     hosts: primary.hosts.length ? primary.hosts : secondary.hosts,
