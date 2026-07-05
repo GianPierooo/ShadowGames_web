@@ -1,0 +1,20 @@
+name: tests
+
+# Corre SOLO los tests offline (fixtures + unidades) en cada push/PR. NO corre el
+# health-check en vivo (test:health), que depende de la red de las fuentes.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test-fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run test:fixtures

@@ -61,7 +61,18 @@ function parseDisplayDates(s: string): { startAt: string | null; endAt: string |
 
 export async function fetchAlakajamJams(): Promise<Jam[]> {
   const events = await fetchJson<AkjEvent[]>(API_EVENTS, { timeoutMs: 10000 });
-  const now = Date.now();
+  return parseAlakajamEvents(events);
+}
+
+/**
+ * Parsea la lista de eventos de la API de Alakajam a Jam[] (función PURA, sin red
+ * → testeable con fixtures). `nowMs` inyectable para deterministas (default: ahora).
+ */
+export function parseAlakajamEvents(
+  events: AkjEvent[],
+  nowMs: number = Date.now(),
+): Jam[] {
+  const now = nowMs;
   const out: Jam[] = [];
   let skippedTbd = 0;
 

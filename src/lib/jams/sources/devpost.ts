@@ -30,16 +30,23 @@ interface DevpostResponse {
   hackathons?: DevpostHackathon[];
 }
 
-export async function fetchDevpostJams(): Promise<Jam[]> {
-  const data = await fetchJson<DevpostResponse>(API_URL);
+/**
+ * Parsea la respuesta JSON de Devpost a Jam[] (función PURA, sin red →
+ * testeable con fixtures). Filtra a hackathons de gamedev y mapea.
+ */
+export function parseDevpostJson(data: DevpostResponse): Jam[] {
   const hackathons = data.hackathons ?? [];
-
   return hackathons
     .filter((h) => {
       const haystack = [h.title, ...(h.themes?.map((t) => t.name) ?? [])].join(" ");
       return GAMEDEV_RE.test(haystack);
     })
     .map(toJam);
+}
+
+export async function fetchDevpostJams(): Promise<Jam[]> {
+  const data = await fetchJson<DevpostResponse>(API_URL);
+  return parseDevpostJson(data);
 }
 
 function toJam(h: DevpostHackathon): Jam {

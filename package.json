@@ -13,7 +13,10 @@
     "press:zip": "node scripts/build-press-zip.mjs",
     "test:adapters": "tsx scripts/test-adapters.ts",
     "ingest:once": "tsx scripts/ingest-once.ts",
-    "query:jams": "tsx scripts/query-jams.ts"
+    "query:jams": "tsx scripts/query-jams.ts",
+    "test": "vitest run",
+    "test:fixtures": "vitest run",
+    "test:health": "tsx scripts/health-check.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -53,6 +56,7 @@
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.1.9"
   }
 }

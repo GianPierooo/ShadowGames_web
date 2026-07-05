@@ -19,7 +19,14 @@ const MONTHS: Record<string, number> = {
 
 export async function fetchGlobalGameJamJams(): Promise<Jam[]> {
   const html = await fetchText(HOME, { timeoutMs: 12000 });
+  return parseGlobalGameJam(html);
+}
 
+/**
+ * Parsea el HTML de la home de GGJ a Jam[] (función PURA, sin red → testeable con
+ * fixtures). `nowMs` inyectable para deterministas (default: ahora).
+ */
+export function parseGlobalGameJam(html: string, nowMs: number = Date.now()): Jam[] {
   // "Jam Dates</strong><br>25 - 31 January 2027" (tolerante a espacios/markup);
   // fallback: cualquier "DD - DD <Mes> 20XX" cerca del texto "Jam Dates".
   const near = html.match(
@@ -41,7 +48,7 @@ export async function fetchGlobalGameJamJams(): Promise<Jam[]> {
   const startAt = new Date(Date.UTC(year, mo, Number(loose[1]))).toISOString();
   const endAt = new Date(Date.UTC(year, mo, Number(loose[2]), 23, 59, 0)).toISOString();
 
-  if (Date.parse(endAt) < Date.now()) {
+  if (Date.parse(endAt) < nowMs) {
     console.log(`[globalgamejam] la edición ${startAt}→${endAt} ya pasó; sin próxima anunciada.`);
     return [];
   }
