@@ -111,7 +111,8 @@ export interface JamQueryFilters {
   language?: string;
   aiPolicy?: AiPolicy;
   mode?: JamMode;
-  source?: JamSource;
+  /** Filtra por pertenencia a un conjunto de fuentes (IN). */
+  sources?: JamSource[];
   /** Búsqueda por título (ILIKE). */
   q?: string;
   /** Orden (default: deadline). */
@@ -159,7 +160,8 @@ export async function queryJams(filters: JamQueryFilters = {}): Promise<Jam[]> {
   if (filters.language) conds.push(sql`${filters.language} = any(languages)`);
   if (filters.aiPolicy) conds.push(sql`ai_policy = ${filters.aiPolicy}`);
   if (filters.mode) conds.push(sql`mode = ${filters.mode}`);
-  if (filters.source) conds.push(sql`source = ${filters.source}`);
+  if (filters.sources?.length)
+    conds.push(sql`source = any(${filters.sources}::text[])`);
   if (filters.q) conds.push(sql`title ilike ${"%" + filters.q + "%"}`);
 
   const whereSql = conds.length

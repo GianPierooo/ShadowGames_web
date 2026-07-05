@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Export CSV de las jams activas, con los mismos filtros por query params que
- * la web (premio, idioma, ia, modalidad, fuente, q, orden).
+ * la web (premio, efectivo, idioma, ia, fuente multi, cierra, duracion, q, orden).
  */
 export async function GET(request: Request) {
   const sp = Object.fromEntries(new URL(request.url).searchParams.entries());
