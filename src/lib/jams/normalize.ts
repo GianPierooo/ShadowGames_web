@@ -41,10 +41,45 @@ function datesClose(a: Jam, b: Jam): boolean {
 }
 
 /**
- * Elimina duplicados en dos niveles:
+ * Fusiona dos jams consideradas la MISMA (mismo evento en dos fuentes). La de
+ * mayor `enrichmentConfidence` manda como base; sus campos vacíos se rellenan con
+ * los de la otra, y se unen tags/idiomas. Así no se pierde info: p. ej. la de
+ * itch trae fechas y la de un agregador trae el premio.
+ */
+function mergeJams(a: Jam, b: Jam): Jam {
+  const [primary, secondary] =
+    a.enrichmentConfidence >= b.enrichmentConfidence ? [a, b] : [b, a];
+  const pick = <T>(p: T | null, s: T | null): T | null => (p != null ? p : s);
+  const uniq = (xs: string[]): string[] => [...new Set(xs)];
+  return {
+    ...primary,
+    startAt: pick(primary.startAt, secondary.startAt),
+    endAt: pick(primary.endAt, secondary.endAt),
+    durationDays: pick(primary.durationDays, secondary.durationDays),
+    theme: pick(primary.theme, secondary.theme),
+    hasPrize: primary.hasPrize != null ? primary.hasPrize : secondary.hasPrize,
+    prizeSummary: pick(primary.prizeSummary, secondary.prizeSummary),
+    prizeValueUsd: pick(primary.prizeValueUsd, secondary.prizeValueUsd),
+    participants: pick(primary.participants, secondary.participants),
+    country: pick(primary.country, secondary.country),
+    ranked: primary.ranked != null ? primary.ranked : secondary.ranked,
+    aiPolicy: primary.aiPolicy !== "unknown" ? primary.aiPolicy : secondary.aiPolicy,
+    tags: uniq([...primary.tags, ...secondary.tags]),
+    languages: uniq([...primary.languages, ...secondary.languages]),
+    hosts: primary.hosts.length ? primary.hosts : secondary.hosts,
+    enrichmentConfidence: Math.max(
+      primary.enrichmentConfidence,
+      secondary.enrichmentConfidence,
+    ),
+  };
+}
+
+/**
+ * Elimina/unifica duplicados en dos niveles:
  *  1. por (source, sourceId) exacto;
- *  2. cruzado entre fuentes por título normalizado + fechas cercanas.
- * En un empate gana la jam con mayor `enrichmentConfidence`.
+ *  2. cruzado ENTRE fuentes por título normalizado + fechas cercanas.
+ * En ambos niveles los duplicados se FUSIONAN (mergeJams): base = mayor confianza,
+ * rellenando huecos con la otra fuente.
  */
 export function dedupe(jams: Jam[]): Jam[] {
   // Nivel 1: clave (source, sourceId).
@@ -52,12 +87,10 @@ export function dedupe(jams: Jam[]): Jam[] {
   for (const jam of jams) {
     const key = `${jam.source}::${jam.sourceId}`;
     const existing = byId.get(key);
-    if (!existing || jam.enrichmentConfidence > existing.enrichmentConfidence) {
-      byId.set(key, jam);
-    }
+    byId.set(key, existing ? mergeJams(existing, jam) : jam);
   }
 
-  // Nivel 2: título normalizado + fechas cercanas.
+  // Nivel 2: título normalizado + fechas cercanas (dedup cruzado entre fuentes).
   const kept: Jam[] = [];
   for (const jam of byId.values()) {
     const nt = normTitle(jam.title);
@@ -66,8 +99,8 @@ export function dedupe(jams: Jam[]): Jam[] {
     );
     if (dupIndex === -1) {
       kept.push(jam);
-    } else if (jam.enrichmentConfidence > kept[dupIndex]!.enrichmentConfidence) {
-      kept[dupIndex] = jam;
+    } else {
+      kept[dupIndex] = mergeJams(kept[dupIndex]!, jam);
     }
   }
   return kept;

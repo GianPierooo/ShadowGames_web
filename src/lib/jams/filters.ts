@@ -55,6 +55,8 @@ export const SOURCES: JamSource[] = [
   "itch",
   "devpost",
   "ludumdare",
+  "alakajam",
+  "globalgamejam",
   "cultura-pe",
   "cva-pe",
 ];

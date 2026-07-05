@@ -437,6 +437,8 @@ a:focus-visible {
   --source-itch: #f2696b;
   --source-devpost: #4fb0a5;
   --source-ludumdare: #e79a4a;
+  --source-alakajam: #46c2b0;
+  --source-globalgamejam: #e0533d;
   --source-cultura-pe: #a78bfa;
   --source-cva-pe: #b47be0;
 }
@@ -485,6 +487,8 @@ a:focus-visible {
   --color-source-itch: var(--source-itch);
   --color-source-devpost: var(--source-devpost);
   --color-source-ludumdare: var(--source-ludumdare);
+  --color-source-alakajam: var(--source-alakajam);
+  --color-source-globalgamejam: var(--source-globalgamejam);
   --color-source-cultura-pe: var(--source-cultura-pe);
   --color-source-cva-pe: var(--source-cva-pe);
 }
