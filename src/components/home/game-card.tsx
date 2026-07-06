@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
+import { GameImage } from "@/components/games/game-image";
 import type { Game } from "@/lib/games";
 import { cn } from "@/lib/cn";
 
@@ -14,16 +15,14 @@ interface GameCardProps {
 /**
  * Tarjeta de juego para el grid.
  *
- * Fase 1: las imágenes de `public/games/<slug>/` aún no existen, así que
- * renderizamos un fallback de gradiente derivado de `accentColor`. En H2,
- * cuando haya key art, se sustituye el fallback por <Image src={game.cardArt}>.
+ * `GameImage` intenta cargar `game.cardArt` y cae sola al fallback de
+ * gradiente si el archivo aún no existe — así no hace falta tocar este
+ * componente cuando lleguen los assets de cada juego.
  *
  * El overlay de hover usa transform/opacity (sin layout shift) y queda
  * visible siempre en pantallas táctiles (no hay hover fiable).
  */
 export function GameCard({ game, statusLabel, className }: GameCardProps) {
-  const accent = game.accentColor ?? "#8b5cf6";
-
   return (
     <Link
       href={{ pathname: "/juegos/[slug]", params: { slug: game.slug } }}
@@ -37,20 +36,12 @@ export function GameCard({ game, statusLabel, className }: GameCardProps) {
       /* Sin aria-label: el accessible name se computa del contenido (h3 + meta),
          que es más descriptivo. aria-label sobrescribía y generaba mismatch. */
     >
-      {/* Fallback visual (gradiente). En H2 → <Image fill src={game.cardArt} /> */}
-      <div
-        className="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-105"
-        style={{
-          background: `radial-gradient(120% 100% at 30% 20%, ${accent}55 0%, transparent 55%), linear-gradient(160deg, var(--surface-2) 0%, var(--bg) 100%)`,
-        }}
-      >
-        <span
-          className="absolute inset-0 grid place-items-center font-display text-7xl font-bold opacity-10"
-          aria-hidden
-        >
-          {game.title.es.charAt(0)}
-        </span>
-      </div>
+      <GameImage
+        src={game.cardArt}
+        alt={game.title.es}
+        accentColor={game.accentColor}
+        className="transition-transform duration-500 ease-out group-hover:scale-105"
+      />
 
       {/* Degradado inferior para legibilidad del texto */}
       <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
