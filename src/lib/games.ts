@@ -101,132 +101,11 @@ export interface Game {
 }
 
 /**
- * Catálogo. Los 6 primeros con `featured: true` son los que ven en el home.
- * Las rutas de imágenes apuntan a `/games/<slug>/...`; en H2 colocaremos los
- * placeholders reales (key art generado o fallback). Hasta entonces, los
- * componentes deben degradar a un fallback visual (gradient + título).
+ * Catálogo. `featured: true` (máx. 6) son los que se ven en el home.
+ * `keyArt`/`cardArt` apuntan a `/games/<slug>/...`; si el archivo no existe
+ * todavía, `GameImage` degrada sola al fallback visual (gradient + inicial).
  */
 export const GAMES: Game[] = [
-  {
-    slug: "penumbra-eterna",
-    title: { es: "Penumbra Eterna", en: "Eternal Dusk" },
-    tagline: {
-      es: "Un reino sin sol. Una sombra que recuerda.",
-      en: "A kingdom without sun. A shadow that remembers.",
-    },
-    year: 2025,
-    status: "released",
-    genres: ["action-rpg", "atmosférico", "narrativo"],
-    platforms: ["pc", "steam", "ps5"],
-    keyArt: "/games/penumbra-eterna/key-art.jpg",
-    cardArt: "/games/penumbra-eterna/card.jpg",
-    screenshots: [
-      "/games/penumbra-eterna/screen-1.jpg",
-      "/games/penumbra-eterna/screen-2.jpg",
-      "/games/penumbra-eterna/screen-3.jpg",
-    ],
-    description: {
-      es: "Action-RPG en un mundo donde la luz del sol murió hace mil años. Combate con armas de luz residual contra criaturas hechas de olvido.",
-    },
-    longDescription: {
-      es: "En Penumbra Eterna, el sol cayó del cielo hace mil años y desde entonces todo se mueve a media luz. Encarnas a un guardián de la última brasa, capaz de empuñar fragmentos de luz solar fosilizada como arma. Cada zona del mapa tiene su propia regla de iluminación que afecta combate, sigilo y exploración. La narrativa se cuenta en susurros: a través de objetos, ambientes y NPCs que solo te hablan si te quedas quieto el tiempo suficiente.",
-    },
-    links: {
-      steam: "#",
-    },
-    featured: true,
-    accentColor: "#8b5cf6",
-    // DEMO VIDEO (caso Unreal / motores sin export web → mostramos tráiler).
-    // provider "youtube": `url` = ID o URL del vídeo de YouTube.
-    // Para tráiler propio sin terceros: { kind: "video", provider: "mp4",
-    //   url: "/games/penumbra-eterna/trailer.mp4" } (archivo en public/).
-    demo: {
-      kind: "video",
-      provider: "youtube",
-      url: "aqz-KE-bpKQ",
-    },
-  },
-  {
-    slug: "voces-de-niebla",
-    title: { es: "Voces de Niebla", en: "Fog Voices" },
-    tagline: { es: "Escucha lo que el bosque no quiere decirte." },
-    year: 2025,
-    status: "early-access",
-    genres: ["horror psicológico", "exploración", "audio-narrativo"],
-    platforms: ["pc", "steam"],
-    keyArt: "/games/voces-de-niebla/key-art.jpg",
-    cardArt: "/games/voces-de-niebla/card.jpg",
-    screenshots: [
-      "/games/voces-de-niebla/screen-1.jpg",
-      "/games/voces-de-niebla/screen-2.jpg",
-    ],
-    description: {
-      es: "Horror psicológico en primera persona donde el audio binaural es la única forma de saber qué te rodea. Una pueblo, un bosque, voces que solo escuchas tú.",
-    },
-    longDescription: {
-      es: "Voces de Niebla es un horror psicológico que se juega tanto con los oídos como con los ojos. Diseñado para audífonos, usa audio binaural en tiempo real para construir un bosque que cambia según lo que escuchas — o crees escuchar. No hay combate. Hay decisiones, silencios, y la certeza creciente de que el bosque te conoce desde antes de que llegaras.",
-    },
-    links: {
-      steam: "#",
-    },
-    featured: true,
-    accentColor: "#6d4ad6",
-  },
-  {
-    slug: "ultimo-tren-sur",
-    title: { es: "Último Tren al Sur", en: "Last Train South" },
-    tagline: { es: "El sur ya no existe. El tren sigue saliendo." },
-    year: 2024,
-    status: "released",
-    genres: ["aventura narrativa", "puzzle", "pixel art"],
-    platforms: ["pc", "mac", "steam", "switch"],
-    keyArt: "/games/ultimo-tren-sur/key-art.jpg",
-    cardArt: "/games/ultimo-tren-sur/card.jpg",
-    screenshots: [
-      "/games/ultimo-tren-sur/screen-1.jpg",
-      "/games/ultimo-tren-sur/screen-2.jpg",
-      "/games/ultimo-tren-sur/screen-3.jpg",
-      "/games/ultimo-tren-sur/screen-4.jpg",
-    ],
-    description: {
-      es: "Aventura narrativa de 4 horas en un tren que cruza un país que se está borrando. Cada vagón es un puzzle, cada pasajero un secreto.",
-    },
-    longDescription: {
-      es: "Una aventura corta, densa y profundamente personal. Viajas en el último tren con destino a un país que se está disolviendo desde el sur hacia el norte. Cada vagón es un puzzle ambiental basado en objetos y diálogos, y cada pasajero carga una historia que decide si quiere contarte. El final cambia según cuántos secretos hayas escuchado.",
-    },
-    links: {
-      steam: "#",
-      itch: "#",
-    },
-    featured: true,
-    // DEMO DOWNLOAD (build de PC, p.ej. export de Unreal sin versión web).
-    // `url` = enlace directo al instalador o .zip (hosting propio, itch, Drive…).
-    // `platform` = etiqueta visible en el botón.
-    demo: {
-      kind: "download",
-      url: "https://example.com/builds/ultimo-tren-sur-demo-win.zip",
-      platform: "Windows",
-    },
-  },
-  {
-    slug: "ceniza-y-cobre",
-    title: { es: "Ceniza y Cobre", en: "Ash & Copper" },
-    tagline: { es: "Una ciudad que arde despacio. Tú, el último herrero." },
-    year: 2026,
-    status: "in-development",
-    genres: ["crafting", "city-builder", "narrativa"],
-    platforms: ["pc", "steam"],
-    keyArt: "/games/ceniza-y-cobre/key-art.jpg",
-    cardArt: "/games/ceniza-y-cobre/card.jpg",
-    screenshots: [],
-    description: {
-      es: "City-builder íntimo en una ciudad que arde sin prisa. Eres el último herrero: cada herramienta que forjas decide qué barrio sobrevive una noche más.",
-    },
-    longDescription: {
-      es: "Ceniza y Cobre es un city-builder en miniatura sobre una ciudad medieval que lleva siglos ardiendo lentamente. No puedes apagar el fuego — solo retrasarlo. Como último herrero, decides qué herramientas forjar cada noche: una pala salva el cementerio una semana más; una campana avisa al barrio del puerto; una llave permite huir al niño. Pequeñas elecciones, gran peso.",
-    },
-    featured: true,
-  },
   {
     slug: "luminaria",
     title: { es: "Luminaria", en: "Luminaria" },
@@ -263,103 +142,6 @@ export const GAMES: Game[] = [
       aspectRatio: 16 / 9,
     },
   },
-  {
-    slug: "el-coleccionista",
-    title: { es: "El Coleccionista", en: "The Collector" },
-    tagline: { es: "Catorce objetos. Catorce muertes que no recuerdas." },
-    year: 2025,
-    status: "released",
-    genres: ["narrativa", "detective", "primera persona"],
-    platforms: ["pc", "steam"],
-    keyArt: "/games/el-coleccionista/key-art.jpg",
-    cardArt: "/games/el-coleccionista/card.jpg",
-    screenshots: [
-      "/games/el-coleccionista/screen-1.jpg",
-      "/games/el-coleccionista/screen-2.jpg",
-    ],
-    description: {
-      es: "Detective narrativo en una sola habitación. Catorce objetos, cada uno un crimen. Tu trabajo: ordenar los recuerdos antes de que la habitación se quede sin luz.",
-    },
-    longDescription: {
-      es: "Una sola habitación. Catorce objetos sobre una mesa. Cada uno guarda el recuerdo de un crimen que cometiste y olvidaste. Tienes hasta que la vela se consuma para reconstruir el orden cronológico y entender por qué empezaste a coleccionar. Inspirado en Return of the Obra Dinn y los relatos de Carlos Castán.",
-    },
-    links: {
-      steam: "#",
-      itch: "#",
-    },
-    featured: true,
-  },
-  {
-    slug: "rio-de-sal",
-    title: { es: "Río de Sal", en: "Salt River" },
-    tagline: { es: "El río no perdona dos veces." },
-    year: 2026,
-    status: "coming-soon",
-    genres: ["roguelike", "supervivencia"],
-    platforms: ["pc", "steam"],
-    keyArt: "/games/rio-de-sal/key-art.jpg",
-    cardArt: "/games/rio-de-sal/card.jpg",
-    screenshots: [],
-    description: {
-      es: "Roguelike de supervivencia río abajo. Cada partida, un río distinto. Cada partida, una sola oportunidad de leer las corrientes.",
-    },
-    featured: false,
-  },
-  {
-    slug: "marea-baja",
-    title: { es: "Marea Baja", en: "Low Tide" },
-    tagline: { es: "Cuando el mar se va, lo que deja también respira." },
-    year: 2024,
-    status: "released",
-    genres: ["walking sim", "atmosférico"],
-    platforms: ["pc", "mac", "steam"],
-    keyArt: "/games/marea-baja/key-art.jpg",
-    cardArt: "/games/marea-baja/card.jpg",
-    screenshots: [
-      "/games/marea-baja/screen-1.jpg",
-      "/games/marea-baja/screen-2.jpg",
-    ],
-    description: {
-      es: "Walking sim de 90 minutos en una playa donde el mar se retiró y nunca volvió. Lo que descubres no quería ser visto.",
-    },
-    links: {
-      steam: "#",
-      itch: "#",
-    },
-    featured: false,
-  },
-  {
-    slug: "noche-de-papel",
-    title: { es: "Noche de Papel", en: "Paper Night" },
-    tagline: { es: "Despliega la noche. Pliega lo que encuentres." },
-    year: 2025,
-    status: "in-development",
-    genres: ["puzzle", "stop-motion"],
-    platforms: ["pc", "switch", "mobile"],
-    keyArt: "/games/noche-de-papel/key-art.jpg",
-    cardArt: "/games/noche-de-papel/card.jpg",
-    screenshots: [],
-    description: {
-      es: "Puzzle estilo stop-motion donde el mundo es papel doblado. Plegando y desplegando avanzas por una noche que cabe en un cuaderno.",
-    },
-    featured: false,
-  },
-  {
-    slug: "los-jardines-bajo",
-    title: { es: "Los Jardines de Abajo", en: "The Gardens Below" },
-    tagline: { es: "Lo que crece en la oscuridad también florece." },
-    year: 2027,
-    status: "coming-soon",
-    genres: ["simulación", "atmosférico"],
-    platforms: ["pc", "steam", "ps5"],
-    keyArt: "/games/los-jardines-bajo/key-art.jpg",
-    cardArt: "/games/los-jardines-bajo/card.jpg",
-    screenshots: [],
-    description: {
-      es: "Simulación contemplativa: heredas un jardín subterráneo. Cuídalo. No subas a la superficie hasta que entiendas por qué tu abuela nunca volvió.",
-    },
-    featured: false,
-  },
   // ── Juego REAL de ShadowGames (Godot 4, jugable en la misma página) ──────
   // Título y tagline tomados de la pantalla de título del juego.
   {
@@ -380,7 +162,7 @@ export const GAMES: Game[] = [
       es: "Una pequeña odisea sobre la transformación: acompañas a una oruga desde la pradera hasta el vuelo, pasando por la quietud de la crisálida. Un juego corto hecho en Godot, jugable aquí mismo en el navegador.",
       en: "A small odyssey about transformation: you follow a caterpillar from the meadow to flight, through the stillness of the chrysalis. A short game made in Godot, playable right here in the browser.",
     },
-    featured: false,
+    featured: true,
     // DEMO EMBED — build de Godot 4 (Web/HTML5, sin threads) self-hosted en
     // public/games/metamorfosis/demo/. Se juega en la misma página, sin terceros.
     // Resolución base 1280×720 → aspect ratio 16:9.
@@ -412,7 +194,7 @@ export const GAMES: Game[] = [
       es: "Una aventura de misterio con puzzles de conexión: explora espacios en penumbra, tiende cables entre puertos para devolver la energía y reconstruye, pieza a pieza, un mañana fragmentado. Hecho en Godot, jugable aquí mismo en el navegador.",
       en: "A mystery adventure built on connection puzzles: explore dim spaces, wire ports together to restore power, and rebuild a fragmented tomorrow piece by piece. Made in Godot, playable right here in the browser.",
     },
-    featured: false,
+    featured: true,
     // DEMO EMBED — build de Godot 4 (Web/HTML5, sin threads) self-hosted en
     // public/games/econexo/demo/ (nombre de proyecto: EcoNexo).
     // Resolución base 1920×1080 → aspect ratio 16:9.
