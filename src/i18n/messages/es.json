@@ -63,7 +63,15 @@
     "buyOn": "Conseguir en",
     "moreInfo": "Más información",
     "nextGame": "Siguiente juego",
-    "prevGame": "Juego anterior"
+    "prevGame": "Juego anterior",
+    "demoHeading": "Demo",
+    "demoPlay": "Jugar demo",
+    "demoTrailer": "Ver tráiler",
+    "demoDownload": "Descargar demo ({platform})",
+    "demoDownloadHint": "La descarga se abrirá en una pestaña nueva.",
+    "demoFullscreen": "Pantalla completa",
+    "demoExitFullscreen": "Salir de pantalla completa",
+    "demoClose": "Cerrar"
   },
   "Status": {
     "released": "Disponible",

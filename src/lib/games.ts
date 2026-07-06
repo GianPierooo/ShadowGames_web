@@ -31,6 +31,54 @@ export interface GameLinks {
   presskit?: string;
 }
 
+/**
+ * Demo jugable / material interactivo del juego en la página de detalle.
+ * Campo OPCIONAL: si un juego no tiene `demo`, no se renderiza nada (cero
+ * placeholders). Tres variantes según cómo exporta el motor:
+ *
+ *  - "embed"    → build HTML5/WebGL jugable EN LA MISMA PÁGINA (iframe).
+ *                 Godot / Unity / Jabalí exportan a WebGL. Puede ser:
+ *                   a) SELF-HOST sin terceros ("tipo itch.io" en nuestro
+ *                      dominio): sube el build a `public/games/<slug>/demo/`
+ *                      y apunta `url` a "/games/<slug>/demo/index.html".
+ *                   b) EMBED EXTERNO de itch.io: usa la URL del iframe que
+ *                      itch te da en "Embed options" (https://itch.io/embed-upload/...).
+ *
+ *  - "video"    → tráiler/gameplay para motores que NO exportan a web (Unreal)
+ *                 o cuando solo quieres mostrar vídeo. `provider`:
+ *                   · "youtube" → `url` = ID (p.ej. "dQw4w9WgXcQ") o URL de YouTube.
+ *                   · "mp4"     → `url` = ruta a un archivo propio, ideal same-origin
+ *                                  (p.ej. "/games/<slug>/trailer.mp4"), sin terceros.
+ *
+ *  - "download" → enlace directo al build de PC (Unreal u otros sin web).
+ *                 `url` = enlace al instalador/zip; `platform` = etiqueta visible
+ *                 en el botón (p.ej. "Windows", "Windows / Linux").
+ */
+export type GameDemo =
+  | {
+      kind: "embed";
+      /**
+       * URL del build HTML5/WebGL. Same-origin ("/games/<slug>/demo/index.html")
+       * para self-host sin terceros, o URL del iframe de itch.io para embed externo.
+       */
+      url: string;
+      /** Relación de aspecto del canvas del build (ancho/alto). Default 16/9. */
+      aspectRatio?: number;
+    }
+  | {
+      kind: "video";
+      provider: "youtube" | "mp4";
+      /** youtube: ID o URL del vídeo. mp4: ruta al archivo (ideal same-origin). */
+      url: string;
+    }
+  | {
+      kind: "download";
+      /** Enlace directo al build (instalador o .zip). */
+      url: string;
+      /** Etiqueta de plataforma mostrada en el botón (p.ej. "Windows"). */
+      platform: string;
+    };
+
 export interface Game {
   slug: string;
   title: LocalizedString;
@@ -48,6 +96,8 @@ export interface Game {
   links?: GameLinks;
   featured: boolean;
   accentColor?: string;
+  /** Demo jugable / vídeo / descarga en la página de detalle. Ver `GameDemo`. */
+  demo?: GameDemo;
 }
 
 /**
@@ -86,6 +136,15 @@ export const GAMES: Game[] = [
     },
     featured: true,
     accentColor: "#8b5cf6",
+    // DEMO VIDEO (caso Unreal / motores sin export web → mostramos tráiler).
+    // provider "youtube": `url` = ID o URL del vídeo de YouTube.
+    // Para tráiler propio sin terceros: { kind: "video", provider: "mp4",
+    //   url: "/games/penumbra-eterna/trailer.mp4" } (archivo en public/).
+    demo: {
+      kind: "video",
+      provider: "youtube",
+      url: "aqz-KE-bpKQ",
+    },
   },
   {
     slug: "voces-de-niebla",
@@ -140,6 +199,14 @@ export const GAMES: Game[] = [
       itch: "#",
     },
     featured: true,
+    // DEMO DOWNLOAD (build de PC, p.ej. export de Unreal sin versión web).
+    // `url` = enlace directo al instalador o .zip (hosting propio, itch, Drive…).
+    // `platform` = etiqueta visible en el botón.
+    demo: {
+      kind: "download",
+      url: "https://example.com/builds/ultimo-tren-sur-demo-win.zip",
+      platform: "Windows",
+    },
   },
   {
     slug: "ceniza-y-cobre",
@@ -186,6 +253,15 @@ export const GAMES: Game[] = [
     },
     featured: true,
     accentColor: "#a78bfa",
+    // DEMO EMBED (self-host, sin terceros). El build HTML5 vive en
+    // `public/games/luminaria/demo/index.html` → se juega en la misma página.
+    // Para un embed de itch.io en su lugar: reemplaza `url` por la URL del
+    // iframe que da itch en "Embed options" (https://itch.io/embed-upload/NNN?...).
+    demo: {
+      kind: "embed",
+      url: "/games/luminaria/demo/index.html",
+      aspectRatio: 16 / 9,
+    },
   },
   {
     slug: "el-coleccionista",
@@ -283,6 +359,68 @@ export const GAMES: Game[] = [
       es: "Simulación contemplativa: heredas un jardín subterráneo. Cuídalo. No subas a la superficie hasta que entiendas por qué tu abuela nunca volvió.",
     },
     featured: false,
+  },
+  // ── Juego REAL de ShadowGames (Godot 4, jugable en la misma página) ──────
+  // Título y tagline tomados de la pantalla de título del juego.
+  {
+    slug: "metamorfosis",
+    title: { es: "Metamorfosis", en: "Metamorphosis" },
+    tagline: {
+      es: "La belleza del proceso.",
+      en: "The beauty of the process.",
+    },
+    year: 2025,
+    status: "released",
+    genres: ["narrativo", "atmosférico", "aventura"],
+    platforms: ["pc"],
+    keyArt: "/games/metamorfosis/key-art.jpg",
+    cardArt: "/games/metamorfosis/card.jpg",
+    screenshots: [],
+    description: {
+      es: "Una pequeña odisea sobre la transformación: acompañas a una oruga desde la pradera hasta el vuelo, pasando por la quietud de la crisálida. Un juego corto hecho en Godot, jugable aquí mismo en el navegador.",
+      en: "A small odyssey about transformation: you follow a caterpillar from the meadow to flight, through the stillness of the chrysalis. A short game made in Godot, playable right here in the browser.",
+    },
+    featured: false,
+    // DEMO EMBED — build de Godot 4 (Web/HTML5, sin threads) self-hosted en
+    // public/games/metamorfosis/demo/. Se juega en la misma página, sin terceros.
+    // Resolución base 1280×720 → aspect ratio 16:9.
+    demo: {
+      kind: "embed",
+      url: "/games/metamorfosis/demo/index.html",
+      aspectRatio: 16 / 9,
+    },
+  },
+  // ── Juego REAL de ShadowGames (Godot 4, jugable en la misma página) ──────
+  // Título "Fragmentos del Mañana" tomado de la pantalla de título del juego.
+  // El slug se mantiene "econexo" (nombre de proyecto; estable, no romper enlaces).
+  // TODO(Leo): afina la descripción a la trama real si hace falta.
+  {
+    slug: "econexo",
+    title: { es: "Fragmentos del Mañana", en: "Fragments of Tomorrow" },
+    tagline: {
+      es: "Reconecta el mañana, fragmento a fragmento.",
+      en: "Reconnect tomorrow, one fragment at a time.",
+    },
+    year: 2025,
+    status: "released",
+    genres: ["puzzle", "misterio", "narrativo"],
+    platforms: ["pc"],
+    keyArt: "/games/econexo/key-art.jpg",
+    cardArt: "/games/econexo/card.jpg",
+    screenshots: [],
+    description: {
+      es: "Una aventura de misterio con puzzles de conexión: explora espacios en penumbra, tiende cables entre puertos para devolver la energía y reconstruye, pieza a pieza, un mañana fragmentado. Hecho en Godot, jugable aquí mismo en el navegador.",
+      en: "A mystery adventure built on connection puzzles: explore dim spaces, wire ports together to restore power, and rebuild a fragmented tomorrow piece by piece. Made in Godot, playable right here in the browser.",
+    },
+    featured: false,
+    // DEMO EMBED — build de Godot 4 (Web/HTML5, sin threads) self-hosted en
+    // public/games/econexo/demo/ (nombre de proyecto: EcoNexo).
+    // Resolución base 1920×1080 → aspect ratio 16:9.
+    demo: {
+      kind: "embed",
+      url: "/games/econexo/demo/index.html",
+      aspectRatio: 16 / 9,
+    },
   },
 ];
 

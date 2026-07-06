@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { TrailerDialog } from "@/components/home/trailer-dialog";
 import { GameImage } from "@/components/games/game-image";
 import { ScreenshotsGallery } from "@/components/games/screenshots-gallery";
+import { DemoSection } from "@/components/games/demo-section";
 import { routeAlternates, SITE_URL, SITE_LEGAL_NAME } from "@/lib/site";
 
 interface PageProps {
@@ -137,7 +138,30 @@ export default async function GameDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 2. Trailer — solo si el juego tiene metadata real.
+      {/* 2. Demo jugable / vídeo / descarga — solo si el juego tiene `demo`.
+          El reproductor (iframe/vídeo) es un client component con montaje
+          diferido: nada pesado carga en el server render ni al abrir la
+          página, solo tras el clic del usuario. */}
+      {game.demo && (
+        <section className="section-y px-6" aria-labelledby="demo-heading">
+          <div className="mx-auto mb-8 max-w-4xl">
+            <h2
+              id="demo-heading"
+              className="font-display text-2xl font-bold text-[var(--text)] md:text-3xl"
+            >
+              {t("demoHeading")}
+            </h2>
+          </div>
+          <DemoSection
+            demo={game.demo}
+            keyArt={game.keyArt}
+            gameTitle={game.title.es}
+            accentColor={game.accentColor}
+          />
+        </section>
+      )}
+
+      {/* 3. Trailer — solo si el juego tiene metadata real.
           PRINCIPLES: cero placeholders "próximamente" decorativos. */}
       {game.trailer && (
         <section className="section-y px-6" aria-label={t("trailer")}>
