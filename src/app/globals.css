@@ -296,15 +296,20 @@ a:focus-visible {
 }
 
 /* ===== Hero: gradient mesh animado ===== */
-/* Scrim del video de fondo del hero. El video es cinemática oscura:
-   - dark: scrim suave → el video se ve (protagonista, texto claro encima).
-   - light: scrim fuerte → el video queda como textura tenue y el texto
-     oscuro conserva contraste (si no, el gameplay brillante lo tapa). */
+/* Scrim del video de fondo del hero. El hero fuerza paleta dark en ambos
+   temas (ver data-theme en hero.tsx), así que el scrim usa el --bg oscuro y
+   una sola opacidad: el video se ve y el texto claro conserva contraste. */
 .hero-scrim {
-  opacity: 0.32;
+  opacity: 0.42;
 }
-[data-theme="light"] .hero-scrim {
-  opacity: 0.82;
+
+/* El video varía de brillo (frames claros y oscuros): un halo oscuro tras el
+   texto del hero garantiza contraste del título/tagline en cualquier frame,
+   sin oscurecer todo el video. */
+.hero-legible {
+  text-shadow:
+    0 2px 24px rgba(0, 0, 0, 0.7),
+    0 1px 6px rgba(0, 0, 0, 0.55);
 }
 
 .mesh-blob {

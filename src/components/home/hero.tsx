@@ -23,12 +23,17 @@ export async function Hero() {
 
   return (
     <section
+      // El hero es un panel cinematográfico oscuro en AMBOS temas: fuerza la
+      // paleta dark localmente (texto claro sobre el video de gameplay oscuro).
+      // El resto de la página sigue respetando el tema del usuario. Sin esto,
+      // en modo día el video oscuro no se veía bajo el texto oscuro.
+      data-theme="dark"
       className="grain relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-6 pb-20 pt-32 text-center"
       aria-labelledby="hero-title"
     >
       <HeroBackdrop />
 
-      <div className="relative z-10 flex max-w-4xl flex-col items-center">
+      <div className="hero-legible relative z-10 flex max-w-4xl flex-col items-center text-[var(--text)]">
         <p className="intro mb-6 text-xs font-medium uppercase tracking-[0.3em] text-[var(--text-subtle)]">
           {t("Brand.manifesto")}
         </p>
