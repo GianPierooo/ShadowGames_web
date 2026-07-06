@@ -1,19 +1,24 @@
+"use client";
+
 /**
  * Imagen de juego con fallback cinematográfico.
  *
- * Fase 1: las rutas `/games/<slug>/...` aún no existen. Este componente
- * SIEMPRE renderiza el fallback (gradiente + viñeta + inicial sutil).
- *
- * Cuando lleguen los assets, sustituir el contenido de este componente
- * por `<Image src={src} fill ... />` y este será el único punto a tocar.
+ * Fase 1→2 (transición): la mayoría de rutas `/games/<slug>/...` aún no
+ * existen. Este componente INTENTA cargar `src`; si el archivo no existe
+ * (404) o falla, cae automáticamente al fallback (gradiente + viñeta +
+ * inicial sutil) — así los juegos sin assets reales siguen viéndose igual
+ * que antes, y los que ya tienen key art (p.ej. econexo) se muestran solos,
+ * sin tocar nada más.
  */
 
+import Image from "next/image";
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 
 interface GameImageProps {
-  /** Ruta del asset cuando exista (`/games/<slug>/...`). Hoy ignorada. */
+  /** Ruta del asset (`/games/<slug>/...`). Si no existe, se usa el fallback. */
   src: string;
-  /** Texto alternativo si se renderiza la imagen real. */
+  /** Texto alternativo de la imagen real. */
   alt: string;
   /** Color de acento del juego (gradiente del placeholder). */
   accentColor?: string;
@@ -32,8 +37,20 @@ export function GameImage({
   className,
   hideInitial = false,
 }: GameImageProps) {
-  void src; // TODO(H2 assets): sustituir por <Image src={src} ... /> cuando existan archivos.
-  void alt; // se cumple semántica con role+aria-label del wrapper
+  const [failed, setFailed] = useState(false);
+
+  if (!failed) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="100vw"
+        className={cn("object-cover", className)}
+        onError={() => setFailed(true)}
+      />
+    );
+  }
 
   const accent = accentColor ?? "#8b5cf6";
   const char = (initial ?? alt.charAt(0)).toUpperCase();
