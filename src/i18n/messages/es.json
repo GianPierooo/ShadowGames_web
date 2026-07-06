@@ -260,6 +260,24 @@
       "groupPrize": "Premio",
       "close": "Cerrar"
     },
+    "detail": {
+      "openLabel": "Ver detalles de {title}",
+      "aria": "Detalles de la jam",
+      "dates": "Fechas",
+      "prize": "Premio",
+      "language": "Idioma",
+      "ai": "IA",
+      "engine": "Motor",
+      "team": "Participación",
+      "ranked": "Ranking",
+      "mode": "Modalidad",
+      "country": "País",
+      "participants": "Participantes",
+      "hosts": "Organiza",
+      "theme": "Tema",
+      "tags": "Etiquetas",
+      "yes": "Sí"
+    },
     "sort": {
       "deadline": "Deadline más próximo",
       "premio": "Premio más alto",

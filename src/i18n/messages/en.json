@@ -260,6 +260,24 @@
       "groupPrize": "Prize",
       "close": "Close"
     },
+    "detail": {
+      "openLabel": "View details for {title}",
+      "aria": "Jam details",
+      "dates": "Dates",
+      "prize": "Prize",
+      "language": "Language",
+      "ai": "AI",
+      "engine": "Engine",
+      "team": "Participation",
+      "ranked": "Ranking",
+      "mode": "Mode",
+      "country": "Country",
+      "participants": "Participants",
+      "hosts": "Hosted by",
+      "theme": "Theme",
+      "tags": "Tags",
+      "yes": "Yes"
+    },
     "sort": {
       "deadline": "Closest deadline",
       "premio": "Highest prize",
