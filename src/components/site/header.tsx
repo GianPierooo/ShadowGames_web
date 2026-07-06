@@ -34,9 +34,17 @@ export function Header() {
 
   const discordReady = SOCIAL.discord !== "#";
 
+  // Páginas con hero oscuro fullbleed (home y detalle de juego): el hero fuerza
+  // paleta dark. Cuando el header flota encima sin scroll, adopta también la
+  // paleta dark para que los enlaces sean legibles sobre el hero oscuro en
+  // modo día. Al hacer scroll (o en páginas con fondo temático) vuelve al tema.
+  const overDarkHero =
+    !scrolled && (pathname === "/" || pathname.startsWith("/juegos/"));
+
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-40 px-4 pt-4 md:pt-5">
       <div
+        data-theme={overDarkHero ? "dark" : undefined}
         className={cn(
           "pointer-events-auto mx-auto flex max-w-6xl items-center justify-between gap-4",
           "rounded-[var(--radius-pill)] border px-4 py-2.5 md:px-5",
