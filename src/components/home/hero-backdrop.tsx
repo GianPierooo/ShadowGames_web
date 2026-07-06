@@ -2,22 +2,18 @@
  * Fondo cinematográfico del hero.
  *
  * Capas (de atrás a delante):
- *  1. Slot de video — listo para un loop de gameplay (ver TODO).
+ *  1. Video loop de gameplay (HeroVideo) + scrim para legibilidad del texto.
  *  2. Gradient mesh animado (3 blobs violeta a la deriva, CSS puro).
- *  3. Viñeta radial para enfocar el centro.
+ *  3. Viñeta radial para enfocar el centro (funde los bordes → oculta el HUD
+ *     del gameplay en las esquinas).
  *  4. Grano (se aplica con la clase `grain` en la sección padre).
  *  5. Partículas violeta flotantes.
  *
- * Todo el movimiento se congela con prefers-reduced-motion (manejado en globals.css).
- *
- * TODO (cuando haya video): sustituir el bloque comentado por:
- *   <video autoPlay muted loop playsInline poster="/hero/poster.jpg"
- *          className="absolute inset-0 h-full w-full object-cover opacity-40">
- *     <source src="/hero/loop.webm" type="video/webm" />
- *     <source src="/hero/loop.mp4" type="video/mp4" />
- *   </video>
- * y bajar la opacidad de los blobs.
+ * Todo el movimiento se congela con prefers-reduced-motion (manejado en
+ * globals.css y, para el video, dentro de HeroVideo).
  */
+
+import { HeroVideo } from "@/components/home/hero-video";
 
 // Posiciones deterministas (evitan mismatch de hidratación).
 const PARTICLES = [
@@ -36,9 +32,15 @@ const PARTICLES = [
 export function HeroBackdrop() {
   return (
     <div className="absolute inset-0 -z-10 overflow-hidden bg-[var(--bg)]" aria-hidden>
-      {/* 1. Slot de video (placeholder cinematográfico hasta tener el loop) */}
+      {/* 1. Video de fondo + scrim. El video es dark; el scrim asegura
+          contraste del h1 y unifica el fondo con la marca. */}
+      <HeroVideo />
+      {/* Scrim theme-aware (opacidad en globals.css): suave en dark (video
+          protagonista), fuerte en light (el video oscuro queda como textura
+          y el texto oscuro conserva contraste). */}
+      <div className="hero-scrim absolute inset-0 bg-[var(--bg)]" />
 
-      {/* 2. Gradient mesh */}
+      {/* 2. Gradient mesh (opacidad reducida: el video ya aporta textura) */}
       <div
         className="mesh-blob mesh-a"
         style={{
@@ -47,7 +49,7 @@ export function HeroBackdrop() {
           left: "-10%",
           top: "-15%",
           background:
-            "radial-gradient(circle, rgba(139,92,246,0.5) 0%, rgba(139,92,246,0) 70%)",
+            "radial-gradient(circle, rgba(139,92,246,0.3) 0%, rgba(139,92,246,0) 70%)",
         }}
       />
       <div
@@ -58,7 +60,7 @@ export function HeroBackdrop() {
           right: "-12%",
           top: "5%",
           background:
-            "radial-gradient(circle, rgba(109,74,214,0.45) 0%, rgba(109,74,214,0) 70%)",
+            "radial-gradient(circle, rgba(109,74,214,0.28) 0%, rgba(109,74,214,0) 70%)",
         }}
       />
       <div
@@ -69,7 +71,7 @@ export function HeroBackdrop() {
           left: "25%",
           bottom: "-25%",
           background:
-            "radial-gradient(circle, rgba(167,139,250,0.35) 0%, rgba(167,139,250,0) 70%)",
+            "radial-gradient(circle, rgba(167,139,250,0.22) 0%, rgba(167,139,250,0) 70%)",
         }}
       />
 

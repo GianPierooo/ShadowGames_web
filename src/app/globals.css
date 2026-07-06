@@ -296,6 +296,17 @@ a:focus-visible {
 }
 
 /* ===== Hero: gradient mesh animado ===== */
+/* Scrim del video de fondo del hero. El video es cinemática oscura:
+   - dark: scrim suave → el video se ve (protagonista, texto claro encima).
+   - light: scrim fuerte → el video queda como textura tenue y el texto
+     oscuro conserva contraste (si no, el gameplay brillante lo tapa). */
+.hero-scrim {
+  opacity: 0.32;
+}
+[data-theme="light"] .hero-scrim {
+  opacity: 0.82;
+}
+
 .mesh-blob {
   position: absolute;
   border-radius: 50%;
