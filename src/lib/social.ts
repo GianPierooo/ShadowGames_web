@@ -1,19 +1,24 @@
 /**
  * URLs de redes sociales y comunidad.
  *
- * Placeholders por ahora — reemplazar con las URLs reales antes del lanzamiento.
- * Convención: si el href es "#", la UI puede mostrar el ítem deshabilitado o
- * ocultarlo. Cuando estén las URLs reales, sustituir aquí y no en componentes.
+ * Convención: si el href es "#", la UI trata el ítem como no listo (lo oculta o
+ * deshabilita, sin abrir en pestaña nueva). Cuando llegue la URL real, sustituir
+ * aquí y no en componentes.
+ *
+ * Nota de tipado: el objeto se anota como `Record<SocialKey, string>` (en vez de
+ * `as const`) a propósito. Con `as const` cada valor tendría tipo literal y las
+ * comparaciones `SOCIAL.x !== "#"` de los componentes darían error TS2367
+ * ("sin solapamiento") en cuanto una red tuviera URL real.
  */
-export const SOCIAL = {
-  discord: "#",
+export type SocialKey = "discord" | "x" | "youtube" | "instagram" | "bluesky";
+
+export const SOCIAL: Record<SocialKey, string> = {
+  discord: "https://discord.gg/vuBUd4n2p",
   x: "#",
   youtube: "#",
   instagram: "#",
   bluesky: "#",
-} as const;
-
-export type SocialKey = keyof typeof SOCIAL;
+};
 
 /** Etiquetas legibles para accesibilidad y tooltips. */
 export const SOCIAL_LABELS: Record<SocialKey, string> = {
