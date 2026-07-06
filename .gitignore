@@ -48,3 +48,9 @@ next-env.d.ts
 # OS
 Thumbs.db
 .lh-tmp/
+
+# codebase-memory-mcp — grafo local del índice de código (herramienta de dev).
+# El binario publicado (0.8.1) NO escribe/lee el snapshot .codebase-memory/graph.db.zst;
+# se ignora hasta que una versión lo soporte (entonces se puede commitear para
+# que otras máquinas hagan diff incremental en vez de reindexar).
+.codebase-memory/
