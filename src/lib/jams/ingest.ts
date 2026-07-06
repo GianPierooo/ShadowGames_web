@@ -5,17 +5,22 @@ import { dedupe, sanitize } from "./normalize";
 import {
   getPersistedEnrichment,
   markNotified,
+  markReminded,
   selectAlertCandidates,
+  selectClosingSoonReminders,
   upsertJams,
 } from "./db";
 import { fetchItchDetail } from "./sources/itch-detail";
 import {
   ALERT_MAX_PER_RUN,
   ALERT_ON_ERROR,
+  REMIND_CLOSING_SOON,
   isDiscordConfigured,
+  sendClosingSoonReminders,
   sendHealthAlert,
   sendJamAlerts,
 } from "./notify/discord";
+import { CLOSING_SOON_DAYS } from "./notify/categorize";
 
 /** Umbral: por encima de esto la jam se considera bien enriquecida. */
 const ENRICHED_THRESHOLD = 0.8;
@@ -42,6 +47,12 @@ export interface IngestResult {
   /** Métricas de alertas a Discord. */
   alerts: {
     skipped: boolean;
+    candidates: number;
+    sent: number;
+  };
+  /** Métricas del recordatorio "cierra pronto" (desactivado por defecto). */
+  reminders: {
+    enabled: boolean;
     candidates: number;
     sent: number;
   };
@@ -77,6 +88,38 @@ async function runAlertPass(): Promise<IngestResult["alerts"]> {
   }
   console.log(`[ingest] alertas: ${sent}/${candidates.length} enviadas a Discord.`);
   return { skipped: false, candidates: candidates.length, sent };
+}
+
+/**
+ * Recordatorio recurrente "cierra pronto": jams con premio que cierran en
+ * ≤ CLOSING_SOON_DAYS y aún no recordadas (reminded_at). DESACTIVADO por defecto
+ * (REMIND_CLOSING_SOON=false) para no spamear. Carril separado de notified_at.
+ */
+async function runReminderPass(): Promise<IngestResult["reminders"]> {
+  if (!REMIND_CLOSING_SOON) return { enabled: false, candidates: 0, sent: 0 };
+  if (!isDiscordConfigured()) {
+    console.log("[ingest] recordatorios: DISCORD_WEBHOOK_URL no configurado, salto.");
+    return { enabled: true, candidates: 0, sent: 0 };
+  }
+  const candidates = await selectClosingSoonReminders(CLOSING_SOON_DAYS, ALERT_MAX_PER_RUN);
+  if (candidates.length === 0) {
+    console.log("[ingest] recordatorios: sin jams que recordar.");
+    return { enabled: true, candidates: 0, sent: 0 };
+  }
+  let sent = 0;
+  try {
+    const delivered = await sendClosingSoonReminders(candidates);
+    if (delivered.length > 0) {
+      await markReminded(delivered.map((j) => `${j.source}::${j.sourceId}`));
+    }
+    sent = delivered.length;
+  } catch (err) {
+    console.warn(
+      `[ingest] recordatorios: fallo general (no tumba la ingesta): ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+  console.log(`[ingest] recordatorios: ${sent}/${candidates.length} enviados a Discord.`);
+  return { enabled: true, candidates: candidates.length, sent };
 }
 
 /**
@@ -178,6 +221,7 @@ export async function ingestJams(): Promise<IngestResult> {
   const pass2 = await runDetailPass(processed);
   const upserted = await upsertJams(pass2.jams);
   const alerts = await runAlertPass();
+  const reminders = await runReminderPass();
 
   const result: IngestResult = {
     report,
@@ -190,9 +234,10 @@ export async function ingestJams(): Promise<IngestResult> {
       failed: pass2.failed,
     },
     alerts,
+    reminders,
   };
   console.log(
-    `[ingest] fuentes=${JSON.stringify(report)} procesadas=${pass2.jams.length} upserted=${upserted} detalle=${JSON.stringify(result.detail)} alertas=${JSON.stringify(alerts)}`,
+    `[ingest] fuentes=${JSON.stringify(report)} procesadas=${pass2.jams.length} upserted=${upserted} detalle=${JSON.stringify(result.detail)} alertas=${JSON.stringify(alerts)} recordatorios=${JSON.stringify(reminders)}`,
   );
 
   // Aviso de salud: solo si alguna fuente falló (no en cada corrida).

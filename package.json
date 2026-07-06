@@ -14,6 +14,8 @@
     "test:adapters": "tsx scripts/test-adapters.ts",
     "ingest:once": "tsx scripts/ingest-once.ts",
     "query:jams": "tsx scripts/query-jams.ts",
+    "migrate": "tsx scripts/migrate.ts",
+    "alert:dryrun": "tsx scripts/alert-dryrun.ts",
     "test": "vitest run",
     "test:fixtures": "vitest run",
     "test:health": "tsx scripts/health-check.ts"

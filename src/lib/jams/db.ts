@@ -374,3 +374,46 @@ export async function markNotified(keys: string[]): Promise<number> {
   `;
   return rows.length;
 }
+
+/**
+ * Recordatorios de "cierra pronto": jams con premio, abiertas, cuyo deadline cae
+ * dentro de `days` días y que NO se han recordado aún (reminded_at null). Es un
+ * carril SEPARADO de notified_at (una jam ya notificada de nueva puede recordarse).
+ * Requiere la columna `reminded_at` (ver scripts/migrate.ts).
+ */
+export async function selectClosingSoonReminders(
+  days: number,
+  limit: number,
+): Promise<Jam[]> {
+  const sql = getSql();
+  const rows = await sql<JamRow[]>`
+    select
+      source, source_id, url, title, hosts,
+      start_at, end_at, duration_days, theme, tags, languages,
+      has_prize, prize_summary, prize_value_usd, ai_policy, mode,
+      participants, country, ranked, featured, enrichment_confidence,
+      engine, team_policy
+    from radar.jams
+    where reminded_at is null
+      and has_prize is true
+      and end_at is not null
+      and end_at >= now()
+      and end_at <= now() + (${days} * interval '1 day')
+    order by end_at asc
+    limit ${Math.min(100, Math.max(1, limit))}
+  `;
+  return rows.map(mapRow);
+}
+
+/** Marca reminded_at = now() para las claves dadas. Devuelve cuántas. */
+export async function markReminded(keys: string[]): Promise<number> {
+  if (keys.length === 0) return 0;
+  const sql = getSql();
+  const rows = await sql`
+    update radar.jams set reminded_at = now()
+    where reminded_at is null
+      and (source || '::' || source_id) = any(${keys}::text[])
+    returning id
+  `;
+  return rows.length;
+}
