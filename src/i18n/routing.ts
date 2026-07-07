@@ -21,6 +21,9 @@ export const routing = defineRouting({
     "/juegos/[slug]": {
       es: "/juegos/[slug]",
     },
+    "/contribuciones": {
+      es: "/contribuciones",
+    },
     "/jams": {
       es: "/jams",
     },

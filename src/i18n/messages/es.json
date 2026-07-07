@@ -10,6 +10,7 @@
   "Nav": {
     "home": "Inicio",
     "games": "Juegos",
+    "contributions": "Contribuciones",
     "radar": "Radar de Jams",
     "studio": "Estudio",
     "press": "Press",
@@ -72,6 +73,14 @@
     "demoFullscreen": "Pantalla completa",
     "demoExitFullscreen": "Salir de pantalla completa",
     "demoClose": "Cerrar"
+  },
+  "Contributions": {
+    "eyebrow": "Colaboraciones",
+    "title": "Contribuciones",
+    "teaserHeading": "Teaser",
+    "galleryHeading": "Capturas",
+    "meetupHeading": "En persona",
+    "watchTeaser": "Ver teaser"
   },
   "Status": {
     "released": "Disponible",

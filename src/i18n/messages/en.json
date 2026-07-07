@@ -10,6 +10,7 @@
   "Nav": {
     "home": "Inicio",
     "games": "Juegos",
+    "contributions": "Contribuciones",
     "radar": "Jam Radar",
     "studio": "Estudio",
     "press": "Press",
@@ -72,6 +73,14 @@
     "demoFullscreen": "Fullscreen",
     "demoExitFullscreen": "Exit fullscreen",
     "demoClose": "Close"
+  },
+  "Contributions": {
+    "eyebrow": "Collaborations",
+    "title": "Contributions",
+    "teaserHeading": "Teaser",
+    "galleryHeading": "Screenshots",
+    "meetupHeading": "In person",
+    "watchTeaser": "Watch teaser"
   },
   "Status": {
     "released": "Disponible",
