@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { CharacterSelect } from "@/components/estudio/character-select";
 import { routeAlternates } from "@/lib/site";
 
 interface PageProps {
@@ -142,6 +143,28 @@ export default async function StudioPage({ params }: PageProps) {
             ))}
           </ol>
         </div>
+      </section>
+
+      {/* 3.5. El equipo — "character select" (dos personas). Interactivo. */}
+      <section
+        className="border-t border-[var(--border)] px-6 py-20 md:py-28"
+        aria-labelledby="team-heading"
+      >
+        <div className="mx-auto mb-10 max-w-prose text-center md:mb-14">
+          <p className="mb-3 text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
+            Sobre nosotros
+          </p>
+          <h2
+            id="team-heading"
+            className="font-display text-3xl font-bold tracking-tight text-[var(--text)] md:text-5xl"
+          >
+            El equipo
+          </h2>
+          <p className="mt-4 text-lg leading-relaxed text-[var(--text-muted)]">
+            Somos dos. Elige un personaje.
+          </p>
+        </div>
+        <CharacterSelect />
       </section>
 
       {/* 4. Cierre — una línea + un único CTA hacia /contacto ──────────── */}
