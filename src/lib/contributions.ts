@@ -97,9 +97,7 @@ export const CONTRIBUTIONS: Contribution[] = [
       photos: [
         "/contribuciones/meetup/04.jpg",
         "/contribuciones/meetup/02.jpg",
-        "/contribuciones/meetup/03.jpg",
         "/contribuciones/meetup/01.jpg",
-        "/contribuciones/meetup/05.jpg",
       ],
     },
   },
