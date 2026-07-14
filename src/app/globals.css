@@ -402,6 +402,89 @@ a:focus-visible {
   animation: scroll-hint 2.2s ease-in-out infinite;
 }
 
+/* ===========================================================================
+ * Foto del equipo ("El estudio") — integración con la penumbra.
+ *
+ * La foto original tiene un fondo de campus MUY blanco que, sin tratar, es una
+ * mancha luminosa en una web oscura. Se integra SÓLO por CSS (el archivo no se
+ * toca) con tres capas sobre la imagen:
+ *   1. velo vertical  → denso arriba (techo blanco) y abajo, LIMPIO en la franja
+ *                       central (35–65%), que es donde están las caras.
+ *   2. viñeta         → funde los bordes; deja libre la elipse central.
+ *   3. luz violeta    → eco del gradiente de marca que ya tenía el placeholder.
+ * Más un filtro suave (desatura y baja el brillo) para bajar el blanco quemado.
+ *
+ * En claro el tratamiento es MUCHO más suave: sobre crema, un velo oscuro
+ * ensuciaría la foto en vez de integrarla.
+ * ========================================================================= */
+:root,
+[data-theme="dark"] {
+  --photo-top: rgba(14, 12, 22, 0.9); /* techo quemado → casi negro */
+  --photo-mid: rgba(14, 12, 22, 0.08); /* franja de las caras: casi limpia */
+  --photo-bottom: rgba(14, 12, 22, 0.74);
+  --photo-vignette: rgba(14, 12, 22, 0.8);
+  --photo-violet: rgba(167, 139, 250, 0.18);
+}
+
+[data-theme="light"] {
+  /* Sobre crema, un velo oscuro ensuciaría la foto: aquí el tratamiento es
+     mínimo (el fondo blanco del campus ya no desentona con un fondo claro). */
+  --photo-top: rgba(24, 21, 52, 0.22);
+  --photo-mid: rgba(24, 21, 52, 0.02);
+  --photo-bottom: rgba(24, 21, 52, 0.18);
+  --photo-vignette: rgba(24, 21, 52, 0.24);
+  --photo-violet: rgba(109, 74, 214, 0.08);
+}
+
+/* La imagen en sí.
+ *
+ * `contrast(<1)` COMPRIME el rango tonal: baja el blanco quemado del campus y a
+ * la vez SUBE las caras, que en el original quedan oscuras por el contraluz.
+ * Medido sobre los píxeles reales (dark): las caras pasan de 5.0%/3.2% a
+ * ~11%/7% de luminancia, el techo cae a ~2% y los negros de la ropa siguen
+ * negros. En claro deja la foto algo mate, que sobre crema lee como intencional.
+ *
+ * NO se tematiza a propósito. Chromium NO re-resuelve `filter` cuando cambia el
+ * tema (ni con var(), ni con selectores [data-theme] — comprobado: el elemento
+ * pasa a hacer match del selector correcto pero la propiedad computada se queda
+ * congelada con el valor del primer paint; sólo se corrige recargando). Con un
+ * valor único no hay nada que invalidar y es correcto en ambos temas. Lo que SÍ
+ * cambia por tema es el velo de abajo (background con var(), que sí invalida). */
+.studio-photo {
+  filter: saturate(0.85) contrast(0.78);
+}
+
+/* Las tres capas de tratamiento, en un solo pseudo-elemento (orden: la primera
+   pinta encima). Va por debajo de cualquier contenido del recuadro. */
+.studio-photo-veil::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Por ENCIMA de la <img> (que va absolute con z-index auto): sin esto el
+     pseudo-elemento, al ser el primer hijo, quedaría pintado debajo. */
+  z-index: 1;
+  pointer-events: none;
+  background:
+    /* 3. luz violeta de marca (arriba-derecha, como el placeholder anterior) */
+    radial-gradient(120% 100% at 70% 18%, var(--photo-violet), transparent 55%),
+    /* 2. viñeta: apaga los bordes (donde queda el pasillo blanco) y respeta la
+          elipse central, que es donde están Gian y Leo */
+      radial-gradient(
+        58% 62% at 50% 50%,
+        transparent 30%,
+        var(--photo-vignette) 100%
+      ),
+    /* 1. velo vertical: denso arriba (techo) y abajo; la franja 36–66% (caras)
+          queda prácticamente limpia */
+      linear-gradient(
+        180deg,
+        var(--photo-top) 0%,
+        var(--photo-mid) 36%,
+        var(--photo-mid) 66%,
+        var(--photo-bottom) 100%
+      );
+}
+
 /* ===== Grano cinematográfico ===== */
 .grain {
   position: relative;

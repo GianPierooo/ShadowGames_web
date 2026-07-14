@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -42,17 +43,21 @@ export async function StudioSection() {
           </div>
         </Reveal>
 
-        {/* Key art (placeholder cinematográfico, ratio 4:5 con viñeta) */}
+        {/* Foto real del equipo (mismo recuadro 4:5 que tenía el placeholder).
+            La foto es 3:2 apaisada: con object-cover se recorta a lo ancho por el
+            centro, donde están Gian y Leo, así que ninguno se sale del encuadre.
+            El tratamiento de color (velo + viñeta + luz violeta) vive en
+            globals.css (.studio-photo / .studio-photo-veil) para poder adaptarlo
+            por tema. No lleva `priority`: la sección va bajo el fold. */}
         <Reveal delay={0.1}>
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)]">
-            <div className="absolute inset-0 bg-[radial-gradient(120%_100%_at_70%_20%,rgba(139,92,246,0.4)_0%,transparent_55%),linear-gradient(200deg,var(--surface-2),var(--bg))]" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)]" />
-            <span
-              className="absolute inset-0 grid place-items-center font-display text-[12rem] font-bold leading-none text-white/[0.04]"
-              aria-hidden
-            >
-              S
-            </span>
+          <div className="studio-photo-veil relative aspect-[4/5] overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)]">
+            <Image
+              src="/estudio-equipo.jpg"
+              alt={t("studioPhotoAlt")}
+              fill
+              sizes="(min-width: 1152px) 544px, (min-width: 768px) 45vw, 100vw"
+              className="studio-photo object-cover object-center"
+            />
           </div>
         </Reveal>
       </div>
