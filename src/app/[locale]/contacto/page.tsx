@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import { SOCIAL } from "@/lib/social";
 import { ContactForm } from "@/components/contact/contact-form";
 import { Toaster } from "@/components/ui/toaster";
@@ -90,17 +89,6 @@ export default async function ContactPage({ params }: PageProps) {
             </li>
             <ChannelLink label={t("channelDiscord")} href={SOCIAL.discord} />
             <ChannelLink label={t("channelTwitter")} href={SOCIAL.x} />
-            <li>
-              <span className="block text-sm text-[var(--text-muted)]">
-                {t("channelPress")}
-              </span>
-              <Link
-                href={{ pathname: "/press" }}
-                className="cursor-pointer text-[var(--text)] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:underline"
-              >
-                /press
-              </Link>
-            </li>
           </ul>
         </aside>
       </div>

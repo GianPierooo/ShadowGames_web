@@ -30,9 +30,6 @@ export const routing = defineRouting({
     "/estudio": {
       es: "/estudio",
     },
-    "/press": {
-      es: "/press",
-    },
     "/contacto": {
       es: "/contacto",
     },

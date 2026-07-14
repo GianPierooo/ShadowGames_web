@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { href: "/contribuciones", key: "contributions" },
   { href: "/jams", key: "radar" },
   { href: "/estudio", key: "studio" },
-  { href: "/press", key: "press" },
   { href: "/contacto", key: "contact" },
 ] as const;
 

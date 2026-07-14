@@ -6,7 +6,6 @@ import { SocialLinks } from "@/components/site/social-links";
 const NAV = [
   { href: "/juegos", key: "games" },
   { href: "/estudio", key: "studio" },
-  { href: "/press", key: "press" },
   { href: "/contacto", key: "contact" },
 ] as const;
 

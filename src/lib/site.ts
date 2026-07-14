@@ -11,7 +11,6 @@ export const SITE_URL = (
 export const SITE_NAME = "Shadow Games";
 export const SITE_LEGAL_NAME = "Shadow Games Studio";
 export const SITE_LOCALE = "es";
-export const PRESS_EMAIL = "shadowgames.devteam@gmail.com";
 
 /** Construye una URL absoluta a partir de un path relativo (con prefijo de locale). */
 export function absoluteUrl(path: string): string {

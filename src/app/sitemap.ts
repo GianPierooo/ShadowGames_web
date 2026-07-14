@@ -19,8 +19,8 @@ const LAST_MODIFIED = "2026-06-08";
 const STATIC_PATHS: Array<{ path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }> = [
   { path: "", priority: 1.0, changeFrequency: "weekly" },
   { path: "/juegos", priority: 0.9, changeFrequency: "weekly" },
+  { path: "/contribuciones", priority: 0.7, changeFrequency: "monthly" },
   { path: "/estudio", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/press", priority: 0.6, changeFrequency: "monthly" },
   { path: "/contacto", priority: 0.5, changeFrequency: "yearly" },
   { path: "/privacidad", priority: 0.2, changeFrequency: "yearly" },
   { path: "/aviso-legal", priority: 0.2, changeFrequency: "yearly" },
