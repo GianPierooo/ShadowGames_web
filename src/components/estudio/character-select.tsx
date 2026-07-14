@@ -4,140 +4,157 @@ import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/cn";
 
+interface Stat {
+  label: string;
+  /** 0–100. */
+  value: number;
+}
+
 interface Member {
   id: string;
   name: string;
-  /** Rol / "clase" del personaje. */
+  /** "Clase" del personaje (rol). */
   role: string;
-  /** Bio corta (1-3 frases). */
-  bio: string;
+  tagline: string;
   portrait: string;
-  /** Acento del personaje (glow/borde al seleccionar). */
   accent: string;
+  stats: Stat[];
 }
 
 /**
- * TODO(Leo): reemplaza `role` y `bio` de cada uno por los reales.
+ * TODO(Leo): rol, tagline y stats son de ejemplo — ajústalos.
  * El orden respeta la foto: Gian a la izquierda, Leo a la derecha.
  */
 const TEAM: Member[] = [
   {
     id: "gian",
     name: "Gian Piero Cano",
-    role: "Co-fundador · Desarrollo",
-    bio: "Una mitad de Shadow Games. Entre código y café, arma los mundos desde dentro. (Bio de ejemplo — reemplázala.)",
+    role: "Programador",
+    tagline: "Arma los mundos desde dentro.",
     portrait: "/equipo/gian.jpg",
     accent: "#8b5cf6",
+    stats: [
+      { label: "Código", value: 92 },
+      { label: "Sistemas", value: 88 },
+      { label: "Lógica", value: 90 },
+      { label: "Café", value: 99 },
+    ],
   },
   {
     id: "leo",
     name: "Leopoldo Brito Ruiz",
-    role: "Co-fundador · Desarrollo",
-    bio: "La otra mitad de Shadow Games. Diseña, dibuja y le pone alma a cada proyecto. (Bio de ejemplo — reemplázala.)",
+    role: "Artista",
+    tagline: "Le pone alma a cada proyecto.",
     portrait: "/equipo/leo.jpg",
     accent: "#e7a95c",
+    stats: [
+      { label: "Arte", value: 91 },
+      { label: "Narrativa", value: 89 },
+      { label: "Diseño", value: 87 },
+      { label: "Ideas", value: 94 },
+    ],
   },
 ];
 
 /**
- * "Character select" del equipo: dos retratos estilo selector de personaje.
- * Al posar el cursor (o enfocar/tocar) sobre uno, ese toma protagonismo
- * (zoom + glow del acento) y el otro se atenúa/dessatura; abajo aparece la
- * info del seleccionado. En táctil se selecciona con un toque.
+ * "Character select" del equipo. Dos fichas estilo selector de personaje:
+ * el retrato se muestra COMPLETO (sin recortar) y al lado sus estadísticas
+ * de videojuego. Al posar el cursor (o enfocar/tocar) sobre una ficha, ese
+ * personaje toma protagonismo (zoom + glow de su acento) y el otro se
+ * atenúa/dessatura. En táctil se selecciona con un toque.
  */
 export function CharacterSelect() {
   const [active, setActive] = useState<number | null>(null);
-  const selected = active !== null ? TEAM[active] : null;
 
   return (
-    <div onMouseLeave={() => setActive(null)}>
-      <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 md:gap-6">
-        {TEAM.map((m, i) => {
-          const isActive = active === i;
-          const isDimmed = active !== null && !isActive;
-          return (
-            <button
-              key={m.id}
-              type="button"
-              onMouseEnter={() => setActive(i)}
-              onFocus={() => setActive(i)}
-              onClick={() => setActive(isActive ? null : i)}
-              aria-pressed={isActive}
-              aria-label={m.name}
-              className={cn(
-                "group relative aspect-[4/5] overflow-hidden rounded-[var(--radius-lg)] border-2 bg-[var(--surface)]",
-                "cursor-pointer transition-[transform,opacity,filter,border-color,box-shadow] duration-300 ease-out",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",
-              )}
-              // Estilos de estado en inline (deterministas, sin depender de la
-              // cascada de utilidades): zoom + glow del activo, atenuado del otro.
-              style={{
-                transform: isActive ? "scale(1.04)" : isDimmed ? "scale(0.97)" : "scale(1)",
-                opacity: isDimmed ? 0.55 : 1,
-                filter: isDimmed ? "grayscale(1) brightness(0.85)" : "none",
-                borderColor: isActive ? m.accent : "var(--border)",
-                boxShadow: isActive ? "var(--shadow-glow)" : "none",
-                zIndex: isActive ? 10 : undefined,
-              }}
-            >
+    <div
+      onMouseLeave={() => setActive(null)}
+      className="mx-auto grid max-w-5xl gap-5 md:grid-cols-2 md:gap-6"
+    >
+      {TEAM.map((m, i) => {
+        const isActive = active === i;
+        const isDimmed = active !== null && !isActive;
+        return (
+          <button
+            key={m.id}
+            type="button"
+            onMouseEnter={() => setActive(i)}
+            onFocus={() => setActive(i)}
+            onClick={() => setActive(isActive ? null : i)}
+            aria-pressed={isActive}
+            aria-label={m.name}
+            className={cn(
+              "group flex gap-4 rounded-[var(--radius-lg)] border-2 bg-[var(--surface)] p-4 text-left",
+              "cursor-pointer transition-[transform,opacity,filter,border-color,box-shadow] duration-300 ease-out",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",
+            )}
+            style={{
+              transform: isActive ? "scale(1.03)" : isDimmed ? "scale(0.98)" : "scale(1)",
+              opacity: isDimmed ? 0.55 : 1,
+              filter: isDimmed ? "grayscale(1) brightness(0.85)" : "none",
+              borderColor: isActive ? m.accent : "var(--border)",
+              boxShadow: isActive ? "var(--shadow-glow)" : "none",
+            }}
+          >
+            {/* Retrato COMPLETO (object-contain: no se recorta) */}
+            <div className="relative h-56 w-24 shrink-0 overflow-hidden rounded-[var(--radius-card)] bg-[var(--bg)] sm:h-64 sm:w-32">
               <Image
                 src={m.portrait}
                 alt={m.name}
                 fill
-                sizes="(min-width: 768px) 360px, 45vw"
-                className="object-cover object-top transition-transform duration-500 ease-out"
+                sizes="128px"
+                className="object-contain transition-transform duration-500 ease-out"
                 style={{
-                  transform: isActive ? "scale(1.06)" : "scale(1)",
-                  filter: !isActive && !isDimmed ? "saturate(0.85)" : undefined,
+                  transform: isActive ? "scale(1.05)" : "scale(1)",
+                  filter: isActive || isDimmed ? "none" : "saturate(0.9)",
                 }}
               />
-              {/* Glow del acento tras el retrato al seleccionar */}
+              {/* Glow del acento al seleccionar */}
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                style={{ background: `radial-gradient(120% 80% at 50% 0%, ${m.accent}33 0%, transparent 60%)` }}
+                className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+                style={{
+                  opacity: isActive ? 1 : 0,
+                  background: `radial-gradient(120% 70% at 50% 0%, ${m.accent}40 0%, transparent 65%)`,
+                }}
               />
-              {/* Degradado inferior + placa de nombre */}
-              <span
-                aria-hidden
-                className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/85 via-black/30 to-transparent"
-              />
-              <span className="absolute inset-x-0 bottom-0 p-3 md:p-4">
-                <span className="block font-display text-sm font-bold leading-tight text-white md:text-lg">
-                  {m.name}
-                </span>
-                <span className="mt-0.5 block text-[11px] uppercase tracking-wider text-white/70 md:text-xs">
-                  {m.role}
-                </span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
+            </div>
 
-      {/* Panel de info del seleccionado (o prompt neutro) */}
-      <div className="mx-auto mt-8 max-w-2xl text-center" aria-live="polite">
-        {selected ? (
-          <div key={selected.id} className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <h3 className="font-display text-2xl font-bold text-[var(--text)] md:text-3xl">
-              {selected.name}
-            </h3>
-            <p
-              className="mt-1 text-sm font-medium uppercase tracking-[0.2em]"
-              style={{ color: selected.accent }}
-            >
-              {selected.role}
-            </p>
-            <p className="mx-auto mt-4 max-w-prose text-lg leading-relaxed text-[var(--text-muted)]">
-              {selected.bio}
-            </p>
-          </div>
-        ) : (
-          <p className="text-base italic text-[var(--text-subtle)]">
-            Pasa el cursor (o toca) sobre cada uno para conocernos.
-          </p>
-        )}
-      </div>
+            {/* Ficha de estadísticas — al lado */}
+            <div className="flex min-w-0 flex-1 flex-col">
+              <p
+                className="text-[11px] font-semibold uppercase tracking-[0.18em]"
+                style={{ color: m.accent }}
+              >
+                {m.role}
+              </p>
+              <h3 className="mt-0.5 font-display text-lg font-bold leading-tight text-[var(--text)] md:text-xl">
+                {m.name}
+              </h3>
+              <p className="mt-1 text-sm italic text-[var(--text-muted)]">{m.tagline}</p>
+
+              <ul className="mt-auto space-y-1.5 pt-4" aria-label={`Estadísticas de ${m.name}`}>
+                {m.stats.map((s) => (
+                  <li key={s.label} className="flex items-center gap-2">
+                    <span className="w-16 shrink-0 text-[11px] uppercase tracking-wide text-[var(--text-subtle)]">
+                      {s.label}
+                    </span>
+                    <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--border)]">
+                      <span
+                        className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500 ease-out"
+                        style={{ width: `${s.value}%`, background: m.accent }}
+                      />
+                    </span>
+                    <span className="w-6 shrink-0 text-right text-[11px] font-medium tabular-nums text-[var(--text-muted)]">
+                      {s.value}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </button>
+        );
+      })}
     </div>
   );
 }
