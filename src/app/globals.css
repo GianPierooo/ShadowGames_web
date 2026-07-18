@@ -46,10 +46,36 @@
   /* Estados */
   --danger: #f87171;
 
-  /* Sombras cinematográficas */
+  /* Sombras cinematográficas (los valores por-tema, en capas + hairline, se
+     reescriben abajo en :root / [data-theme]; estos quedan de fallback). */
   --shadow-glow: 0 0 60px -10px rgba(139, 92, 246, 0.4);
   --shadow-card: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
   --shadow-card-hover: 0 16px 40px -12px rgba(139, 92, 246, 0.25);
+
+  /* ===========================================================================
+   * CAPA DE CRAFT (Fase 2) — tokens de sistema que hereda toda la web.
+   *
+   * ESCALA TIPOGRÁFICA FLUIDA. El TAMAÑO vive aquí (un solo sitio, con clamp);
+   * el tracking/leading por escalón viven en las utilidades .t-* (más abajo).
+   * Nombres `--fluid-*` a propósito (no `--text-*`) para NO auto-generar
+   * utilidades text-* de Tailwind: se consumen con var() o con las clases .t-*.
+   * ========================================================================= */
+  --fluid-display: clamp(3rem, 8.5vw, 9rem); /* wordmark / hero */
+  --fluid-h1: clamp(2.25rem, 1.4rem + 4.2vw, 4.5rem);
+  --fluid-h2: clamp(1.875rem, 1.35rem + 2.6vw, 3.5rem);
+  --fluid-h3: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
+  --fluid-body-lg: clamp(1.0625rem, 1.02rem + 0.2vw, 1.25rem);
+  --fluid-small: 0.8125rem;
+
+  /* VOCABULARIO DE MOTION — tres curvas + tres duraciones, una sola fuente.
+     --ease-out conserva EXACTAMENTE la curva que ya usaban intro/reveal, para
+     no alterar el feel actual; solo la tokeniza. */
+  --ease-out: cubic-bezier(0.21, 0.47, 0.32, 0.98); /* entrada / settle */
+  --ease-in: cubic-bezier(0.55, 0, 0.85, 0.35); /* salida */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1); /* hover / cambios de estado */
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
 }
 
 /* ===== Theme: dark (default) ===== */
@@ -68,6 +94,35 @@
   --accent-hover: var(--color-accent-bright);
   --accent-deep: var(--color-accent-deep);
   --accent-soft: var(--color-accent-soft);
+
+  /* CAPA DE CRAFT (Fase 2) — elevación en capas + hairline de luz.
+     El hairline (inset 1px superior, en crema a baja opacidad) da el borde de
+     luz "hecho a mano" a las superficies oscuras. Las sombras son en capas
+     (contacto cercano + difusa lejana), no una sola sombra plana. */
+  --hairline: inset 0 1px 0 0 rgba(245, 243, 239, 0.06);
+  --elevation-1:
+    inset 0 1px 0 0 rgba(245, 243, 239, 0.05),
+    0 1px 2px -1px rgba(0, 0, 0, 0.5),
+    0 4px 12px -5px rgba(0, 0, 0, 0.45);
+  --elevation-2:
+    inset 0 1px 0 0 rgba(245, 243, 239, 0.06),
+    0 2px 4px -2px rgba(0, 0, 0, 0.5),
+    0 14px 34px -12px rgba(0, 0, 0, 0.55);
+  --elevation-3:
+    inset 0 1px 0 0 rgba(245, 243, 239, 0.08),
+    0 4px 8px -3px rgba(0, 0, 0, 0.5),
+    0 26px 52px -16px rgba(0, 0, 0, 0.6);
+  /* Se reescriben los tokens que ya consumen los componentes → suben de nivel
+     sin editar ni un componente. Conservan el carácter (hover con tinte
+     violeta). Es sombra: no reflowea, no cambia layout. */
+  --shadow-card:
+    inset 0 1px 0 0 rgba(245, 243, 239, 0.05),
+    0 1px 2px -1px rgba(0, 0, 0, 0.5),
+    0 10px 28px -12px rgba(0, 0, 0, 0.55);
+  --shadow-card-hover:
+    inset 0 1px 0 0 rgba(245, 243, 239, 0.09),
+    0 2px 6px -2px rgba(0, 0, 0, 0.5),
+    0 22px 48px -14px rgba(139, 92, 246, 0.28);
 }
 
 /* ===== Theme: light ===== */
@@ -88,6 +143,31 @@
   --accent-hover: #5b3bbf;
   --accent-deep: #4d2faa;
   --accent-soft: rgba(109, 74, 214, 0.1);
+
+  /* CAPA DE CRAFT (Fase 2) — en claro el hairline es un borde de luz BLANCO
+     (highlight superior sobre crema/off-white) y las sombras son más suaves y
+     frías (nunca el negro pesado del tema oscuro, que ensuciaría la crema). */
+  --hairline: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+  --elevation-1:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+    0 1px 2px -1px rgba(24, 21, 52, 0.09),
+    0 4px 12px -5px rgba(24, 21, 52, 0.1);
+  --elevation-2:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 2px 4px -2px rgba(24, 21, 52, 0.1),
+    0 14px 32px -12px rgba(24, 21, 52, 0.14);
+  --elevation-3:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 4px 8px -3px rgba(24, 21, 52, 0.1),
+    0 26px 50px -16px rgba(24, 21, 52, 0.16);
+  --shadow-card:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+    0 1px 2px -1px rgba(24, 21, 52, 0.08),
+    0 10px 26px -12px rgba(24, 21, 52, 0.12);
+  --shadow-card-hover:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 2px 6px -2px rgba(24, 21, 52, 0.1),
+    0 22px 46px -16px rgba(109, 74, 214, 0.18);
 }
 
 /* ===== Base ===== */
@@ -120,15 +200,65 @@ body {
   overflow-x: hidden;
 }
 
-/* Display font helper */
+/* Display font helper.
+ *
+ * CRAFT (Fase 2): antes fijaba `opsz 144` en font-variation-settings, lo que
+ * ANULABA `font-optical-sizing: auto` (el eje explícito gana). Al quitar el
+ * opsz fijo, el optical sizing de Fraunces vuelve a seguir al tamaño real:
+ * los títulos grandes rinden como display (alto contraste) y los pequeños
+ * como texto (más legibles), en vez de forzar el corte display a todo. Se
+ * conservan SOFT/WONK y el tracking. Cambia el render, NO las métricas → no
+ * reflowea. */
 .font-display {
   font-family: var(--font-display), ui-serif, Georgia, serif;
   font-optical-sizing: auto;
   font-variation-settings:
-    "opsz" 144,
     "SOFT" 50,
     "WONK" 0;
   letter-spacing: -0.02em;
+}
+
+/* ===========================================================================
+ * Utilidades de escala tipográfica (Fase 2). Cada escalón = tamaño (token
+ * fluido) + tracking + leading afinados. Ya disponibles para que las fases de
+ * sección sustituyan sus clamp()/text-Nxl/tracking-tight ad-hoc por estas.
+ * Regla: display grande = tracking más cerrado + leading ajustado; cuerpo =
+ * tracking normal + leading legible. No se aplican masivamente en esta fase.
+ * ========================================================================= */
+.t-display {
+  font-size: var(--fluid-display);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+.t-h1 {
+  font-size: var(--fluid-h1);
+  line-height: 1.04;
+  letter-spacing: -0.022em;
+}
+.t-h2 {
+  font-size: var(--fluid-h2);
+  line-height: 1.08;
+  letter-spacing: -0.016em;
+}
+.t-h3 {
+  font-size: var(--fluid-h3);
+  line-height: 1.22;
+  letter-spacing: -0.008em;
+}
+.t-body-lg {
+  font-size: var(--fluid-body-lg);
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+.t-body {
+  font-size: 1rem;
+  line-height: 1.65;
+  letter-spacing: 0;
+}
+.t-small {
+  font-size: var(--fluid-small);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 
 /* ===========================================================================
@@ -250,11 +380,11 @@ a:focus-visible {
 
 .intro {
   opacity: 0;
-  animation: intro-rise 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+  animation: intro-rise 0.7s var(--ease-out) both;
 }
 /* Variante para el elemento LCP: opaco de principio a fin. */
 .intro-lcp {
-  animation: intro-rise-opaque 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+  animation: intro-rise-opaque 0.7s var(--ease-out) both;
 }
 .intro-d1 {
   animation-delay: 0.08s;
@@ -278,8 +408,8 @@ a:focus-visible {
   opacity: 0;
   transform: translateY(var(--reveal-y, 24px));
   transition:
-    opacity 0.6s cubic-bezier(0.21, 0.47, 0.32, 0.98),
-    transform 0.6s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
   transition-delay: var(--reveal-delay, 0s);
   will-change: opacity, transform;
 }
@@ -287,8 +417,41 @@ a:focus-visible {
   opacity: 1;
   transform: none;
 }
+
+/* ---------------------------------------------------------------------------
+ * Reveal con JERARQUÍA (Fase 2) — capacidad lista, NO aplicada aún.
+ *
+ * <Reveal stagger> revela sus hijos DIRECTOS en cascada: el primero (líder)
+ * entra, los secundarios le siguen escalonados (~70ms). Da jerarquía a una
+ * sección sin un fade uniforme. Se activa por sección en fases posteriores.
+ * ------------------------------------------------------------------------- */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(var(--reveal-y, 16px));
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+  will-change: opacity, transform;
+}
+.reveal-stagger.is-visible > * {
+  opacity: 1;
+  transform: none;
+}
+.reveal-stagger.is-visible > *:nth-child(2) {
+  transition-delay: 70ms;
+}
+.reveal-stagger.is-visible > *:nth-child(3) {
+  transition-delay: 140ms;
+}
+.reveal-stagger.is-visible > *:nth-child(4) {
+  transition-delay: 210ms;
+}
+.reveal-stagger.is-visible > *:nth-child(n + 5) {
+  transition-delay: 280ms;
+}
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  .reveal,
+  .reveal-stagger > * {
     opacity: 1;
     transform: none;
     transition: none;

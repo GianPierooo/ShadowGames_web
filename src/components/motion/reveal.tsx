@@ -12,6 +12,13 @@ interface RevealProps {
   y?: number;
   /** Etiqueta del elemento contenedor. */
   as?: "div" | "section" | "li" | "article";
+  /**
+   * Modo JERARQUÍA (Fase 2): en vez de revelar el contenedor como un bloque,
+   * revela sus hijos DIRECTOS en cascada — el primero (líder) entra y los
+   * secundarios le siguen escalonados. La cascada la resuelve CSS
+   * (`.reveal-stagger` en globals.css); aquí solo se activa la clase.
+   */
+  stagger?: boolean;
 }
 
 /**
@@ -27,7 +34,14 @@ interface RevealProps {
  *   al instante (sin transición).
  * - No-JS: el <noscript> del layout fuerza `.reveal { opacity: 1 }`.
  */
-export function Reveal({ children, className, delay = 0, y = 24, as = "div" }: RevealProps) {
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  y = 24,
+  as = "div",
+  stagger = false,
+}: RevealProps) {
   const ref = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -60,7 +74,11 @@ export function Reveal({ children, className, delay = 0, y = 24, as = "div" }: R
   } as CSSProperties;
 
   return (
-    <Tag ref={ref as React.Ref<never>} className={cn("reveal", className)} style={style}>
+    <Tag
+      ref={ref as React.Ref<never>}
+      className={cn(stagger ? "reveal-stagger" : "reveal", className)}
+      style={style}
+    >
       {children}
     </Tag>
   );

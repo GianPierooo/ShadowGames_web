@@ -111,7 +111,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         {/* Sin JS, los bloques <Reveal> no recibirían .is-visible: forzamos
             su visibilidad para no ocultar contenido (progressive enhancement). */}
         <noscript>
-          <style>{".reveal{opacity:1 !important;transform:none !important}"}</style>
+          <style>{".reveal,.reveal-stagger>*{opacity:1 !important;transform:none !important}"}</style>
         </noscript>
         <script
           type="application/ld+json"

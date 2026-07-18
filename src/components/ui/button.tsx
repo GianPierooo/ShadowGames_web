@@ -7,8 +7,13 @@ const buttonVariants = cva(
   [
     "inline-flex items-center justify-center gap-2",
     "font-sans font-medium whitespace-nowrap",
-    "transition-colors duration-200",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",
+    // CRAFT (Fase 2): transición completa (color + fondo + borde + sombra +
+    // transform) con la curva estándar del sistema, en vez de solo color.
+    "transition [transition-timing-function:var(--ease-standard)] duration-200",
+    // Press sutil: solo si el usuario NO pidió reducir movimiento.
+    "motion-safe:active:scale-[0.98]",
+    // Foco de marca: ring violeta brillante (accent-hover) con gap al fondo.
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-hover)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",
     "disabled:pointer-events-none disabled:opacity-50",
     "cursor-pointer select-none",
   ].join(" "),
