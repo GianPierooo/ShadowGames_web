@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { HeroBackdrop } from "@/components/home/hero-backdrop";
 import { TrailerDialog } from "@/components/home/trailer-dialog";
@@ -34,23 +34,33 @@ export async function Hero() {
       <HeroBackdrop />
 
       <div className="hero-legible relative z-10 flex max-w-4xl flex-col items-center text-[var(--text)]">
-        <p className="intro mb-6 text-xs font-medium uppercase tracking-[0.3em] text-[var(--text-subtle)]">
+        <p className="hero-eyebrow mb-6 text-xs font-medium uppercase tracking-[0.3em] text-[var(--text-subtle)]">
           {t("Brand.manifesto")}
         </p>
 
+        {/* Wordmark: adopta .t-display (Fase 2). Cada palabra sube opaca tras su
+            línea-máscara (SHADOW y luego GAMES). El h1 nunca es opacity:0 → el
+            texto se pinta al instante y el LCP no se degrada. */}
         <h1
           id="hero-title"
-          className="intro-lcp font-display text-[clamp(3rem,12vw,9rem)] font-bold leading-[0.9] tracking-tight"
+          className="font-display t-display font-bold text-[var(--text)]"
         >
-          <span className="block">SHADOW</span>
-          <span className="block text-[var(--accent)]">GAMES</span>
+          <span className="word-mask">
+            <span className="word-rise">SHADOW</span>
+          </span>
+          <span className="word-mask">
+            <span className="word-rise w2 text-[var(--accent)]">GAMES</span>
+          </span>
         </h1>
 
-        <p className="intro intro-d2 mt-8 max-w-xl text-balance text-lg italic text-[var(--text-muted)] md:text-2xl">
-          {t("Brand.tagline")}
+        {/* Tagline: mask-rise completo (emerge desde una línea oculta). */}
+        <p className="hero-tagline mt-8 max-w-xl text-balance text-lg italic text-[var(--text-muted)] md:text-2xl">
+          <span className="line-mask">
+            <span className="line-rise">{t("Brand.tagline")}</span>
+          </span>
         </p>
 
-        <div className="intro intro-d3 mt-12 flex flex-wrap items-center justify-center gap-4">
+        <div className="hero-cta mt-12 flex flex-wrap items-center justify-center gap-4">
           <Button asChild size="lg" variant="solid">
             <Link href="/juegos">
               {t("Hero.ctaGames")}
@@ -62,9 +72,12 @@ export async function Hero() {
         </div>
       </div>
 
-      <div className="scroll-hint absolute bottom-8 left-1/2 z-10 -translate-x-1/2 text-[var(--text-subtle)]">
-        <ChevronDown className="size-6" aria-hidden />
-      </div>
+      {/* Pista de scroll: hairline vertical con una luz que desciende (sobria,
+          de marca) en vez del chevron rebotón. */}
+      <div
+        className="scroll-cue absolute bottom-8 left-1/2 z-10 -translate-x-1/2"
+        aria-hidden
+      />
     </section>
   );
 }

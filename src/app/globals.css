@@ -60,7 +60,7 @@
    * Nombres `--fluid-*` a propósito (no `--text-*`) para NO auto-generar
    * utilidades text-* de Tailwind: se consumen con var() o con las clases .t-*.
    * ========================================================================= */
-  --fluid-display: clamp(3rem, 8.5vw, 9rem); /* wordmark / hero */
+  --fluid-display: clamp(3rem, 10vw, 9rem); /* wordmark / hero */
   --fluid-h1: clamp(2.25rem, 1.4rem + 4.2vw, 4.5rem);
   --fluid-h2: clamp(1.875rem, 1.35rem + 2.6vw, 3.5rem);
   --fluid-h3: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
@@ -548,21 +548,166 @@ a:focus-visible {
   animation: float-particle var(--p-dur, 7s) ease-in-out var(--p-delay, 0s) infinite;
 }
 
-/* ===== Scroll hint ===== */
-@keyframes scroll-hint {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.5;
+/* ===========================================================================
+ * HERO — coreografía de entrada (Fase 1). CSS PURO (sin JS): arranca en el
+ * primer paint, funciona sin JS, y en reduced-motion la media query global
+ * colapsa la duración dejando el estado final limpio. El wordmark NUNCA parte
+ * de opacity:0 → LCP intacto (texto pintado al instante).
+ *
+ * Jerarquía temporal: wordmark (líder, por palabra) → tagline → CTA.
+ * =========================================================================== */
+
+/* Wordmark: rise OPACO por palabra tras una línea-máscara. Opaco siempre
+   (LCP-safe); con leading 0.9 el translate de 0.2em empuja sobre todo el
+   espacio muerto bajo la mayúscula, así que la palabra se lee entera desde el
+   primer frame y sólo "asoma" su borde inferior desde la máscara. */
+.word-mask {
+  display: block;
+  overflow: hidden;
+}
+.word-rise {
+  display: block;
+  /* Base = estado FINAL (translateY 0). El offset inicial (0.2em) lo aporta el
+     `from` del keyframe con `both` (backwards fill), así que si por lo que sea
+     la animación no aplica, el estado por defecto ya es el limpio. */
+  animation: word-rise 0.72s var(--ease-out) both;
+}
+.word-rise.w2 {
+  animation-delay: 0.09s; /* la 2ª palabra entra tras la 1ª */
+}
+@keyframes word-rise {
+  from {
+    transform: translateY(0.2em);
   }
-  50% {
-    transform: translateY(8px);
-    opacity: 1;
+  to {
+    transform: translateY(0);
   }
 }
 
-.scroll-hint {
-  animation: scroll-hint 2.2s ease-in-out infinite;
+/* Tagline: mask-rise COMPLETO (emerge desde una línea oculta). No es el LCP,
+   así que puede partir oculta. Entra después del wordmark. */
+.hero-tagline .line-mask {
+  display: block;
+  overflow: hidden;
+}
+.hero-tagline .line-rise {
+  display: block;
+  animation: line-rise 0.7s var(--ease-out) 0.26s both;
+}
+@keyframes line-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Eyebrow (contexto, con el líder) y CTA (cierre): fade-rise opaco. */
+.hero-eyebrow {
+  animation: hero-fade-rise 0.7s var(--ease-out) 0.12s both;
+}
+.hero-cta {
+  animation: hero-fade-rise 0.7s var(--ease-out) 0.44s both;
+}
+@keyframes hero-fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Pista de scroll: una hairline vertical con una luz que desciende — sobria,
+   de marca, sin chevron rebotón. En reduced-motion queda una línea fija limpia
+   (sin luz en movimiento). Centrada con -translate-x-1/2 (Tailwind): por eso
+   NUNCA se anima su transform, solo la opacidad, para no pisar el centrado. */
+.scroll-cue {
+  width: 1px;
+  height: 54px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--text-subtle) 34%, transparent);
+}
+.scroll-cue::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 42%;
+  background: linear-gradient(to bottom, transparent, var(--accent-hover));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-cue {
+    opacity: 0;
+    animation: hero-fade-in 0.8s var(--ease-out) 0.6s both;
+  }
+  .scroll-cue::after {
+    animation: scroll-cue-run 2.6s var(--ease-standard) 1.2s infinite;
+  }
+}
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scroll-cue-run {
+  0% {
+    transform: translateY(-120%);
+  }
+  100% {
+    transform: translateY(320%);
+  }
+}
+
+/* reduced-motion: estado final estático y limpio (sin depender del fill del
+   0.01ms global). NO se toca el transform de .scroll-cue (guarda su centrado
+   -translate-x-1/2 de Tailwind); solo se apaga su animación. */
+@media (prefers-reduced-motion: reduce) {
+  .word-rise,
+  .hero-tagline .line-rise,
+  .hero-eyebrow,
+  .hero-cta {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .scroll-cue {
+    opacity: 1;
+    animation: none;
+  }
+  .scroll-cue::after {
+    animation: none;
+  }
+}
+
+/* Parallax sutil del backdrop al salir el hero. Scroll-driven CSS NATIVO
+   (fuera del hilo principal → sin jank; sin JS, sin librerías). Empieza en
+   translateY(0) en el tope de la página → alineación perfecta al cargar, LCP
+   intacto. Solo con movimiento permitido y donde el navegador lo soporte; si
+   no, no hay parallax (cero regresión). El backdrop va extendido en vertical
+   (ver hero-backdrop.tsx) para que el desplazamiento no descubra bordes. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .hero-parallax {
+      animation: hero-parallax linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 100svh;
+      will-change: transform;
+    }
+    @keyframes hero-parallax {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(8%);
+      }
+    }
+  }
 }
 
 /* ===========================================================================

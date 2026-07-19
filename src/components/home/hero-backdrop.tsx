@@ -31,7 +31,13 @@ const PARTICLES = [
 
 export function HeroBackdrop() {
   return (
-    <div className="absolute inset-0 -z-10 overflow-hidden bg-[var(--bg)]" aria-hidden>
+    // Extendido en vertical (-top/h) para que el parallax (transform en
+    // `.hero-parallax`, definido en globals.css, scroll-driven CSS) no descubra
+    // bordes al desplazarse. No se toca el <video>: solo el contenedor.
+    <div
+      className="hero-parallax absolute inset-x-0 -top-[12%] h-[124%] -z-10 overflow-hidden bg-[var(--bg)]"
+      aria-hidden
+    >
       {/* 1. Video de fondo + scrim. El video es dark; el scrim asegura
           contraste del h1 y unifica el fondo con la marca. */}
       <HeroVideo />
