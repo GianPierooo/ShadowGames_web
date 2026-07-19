@@ -28,7 +28,7 @@ export async function CommunityBanner() {
 
           <h2
             id="community-heading"
-            className="font-display text-3xl font-bold tracking-tight md:text-5xl"
+            className="font-display t-h2 font-bold"
           >
             {t("communityTitle")}
           </h2>

@@ -177,7 +177,7 @@ export default async function StudioPage({ params }: PageProps) {
           </p>
           <h2
             id="team-heading"
-            className="font-display text-3xl font-bold tracking-tight text-[var(--text)] md:text-5xl"
+            className="font-display t-h2 font-bold text-[var(--text)]"
           >
             El equipo
           </h2>

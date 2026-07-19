@@ -21,7 +21,7 @@ export async function FeaturedGames() {
             </p>
             <h2
               id="games-heading"
-              className="font-display text-4xl font-bold tracking-tight md:text-6xl"
+              className="font-display t-h2 font-bold"
             >
               {t("gamesTitle")}
             </h2>

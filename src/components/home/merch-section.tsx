@@ -26,7 +26,7 @@ export async function MerchSection() {
             </p>
             <h2
               id="merch-heading"
-              className="font-display text-4xl font-bold tracking-tight md:text-6xl"
+              className="font-display t-h2 font-bold"
             >
               SHADOW STUFF
             </h2>
