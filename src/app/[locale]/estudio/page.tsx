@@ -3,6 +3,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { CharacterSelect } from "@/components/estudio/character-select";
+import { Reveal } from "@/components/motion/reveal";
 import { routeAlternates } from "@/lib/site";
 
 interface PageProps {
@@ -108,96 +109,153 @@ export default async function StudioPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 2. Manifiesto largo (prosa narrativa) ─────────────────────────── */}
+      {/* 2. Manifiesto — ritmo editorial ───────────────────────────────── */}
       {/* TODO: bio real — sustituir Studio.bioP1..P4 en es.json cuando el
           cliente pase la copia definitiva. Hasta entonces, placeholder
-          coherente con "Mundos con sombra, hechos a mano". */}
+          coherente con "Mundos con sombra, hechos a mano".
+
+          Se rompe el muro de prosa en movimientos con aire: LEAD (color pleno)
+          → sombra como material → respiro (pull-quote) → cortos y densos. Cada
+          movimiento entra al scroll con Reveal (--ease-out, cascada líder→
+          secundario); en reduced-motion todo queda visible y compuesto. */}
       <section className="section-y px-6" aria-label="Manifiesto">
         <div className="mx-auto max-w-prose">
-          {/* Primer párrafo como LEAD (mayor, color pleno); el resto en muted.
-              Una cita extraída del manifiesto actúa de respiro visual — pull-quote
-              sobrio (barra de acento + display), sin comillas decorativas. */}
-          <p className="text-pretty text-xl leading-relaxed text-[var(--text)] md:text-2xl">
-            {t("bioP1")}
-          </p>
-          <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
-            {t("bioP2")}
-          </p>
-          {/* Color de la barra por estilo inline: globals.css declara un
-              `* { border-color: var(--border) }` SIN capa, que gana a cualquier
-              utilidad `border-[color]` de @layer utilities. El inline sí lo
-              vence, así la barra sale en acento (no en el hairline por defecto). */}
-          <blockquote
-            className="my-10 border-l-2 pl-6 text-balance font-display text-2xl leading-snug text-[var(--text)] md:my-12 md:text-3xl"
-            style={{ borderColor: "color-mix(in oklab, var(--accent) 50%, transparent)" }}
-          >
-            {t("manifestoPull")}
-          </blockquote>
-          <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
-            {t("bioP3")}
-          </p>
-          <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
-            {t("bioP4")}
-          </p>
+          {/* Movimiento 1 — lead + la sombra como material */}
+          <Reveal stagger>
+            <p className="text-pretty text-xl leading-relaxed text-[var(--text)] md:text-2xl">
+              {t("bioP1")}
+            </p>
+            <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
+              {t("bioP2")}
+            </p>
+          </Reveal>
+
+          {/* Respiro — pull-quote sobrio (barra de acento por estilo inline: un
+              `* { border-color }` SIN capa en globals.css gana a las utilidades
+              border-[color]; el inline sí lo vence). Sin comillas decorativas. */}
+          <Reveal>
+            <blockquote
+              className="my-12 border-l-2 pl-6 text-balance font-display text-2xl leading-snug text-[var(--text)] md:my-16 md:text-3xl"
+              style={{ borderColor: "color-mix(in oklab, var(--accent) 50%, transparent)" }}
+            >
+              {t("manifestoPull")}
+            </blockquote>
+          </Reveal>
+
+          {/* Movimiento 2 — cortos y densos / sin prisa */}
+          <Reveal stagger>
+            <p className="text-lg leading-relaxed text-[var(--text-muted)]">
+              {t("bioP3")}
+            </p>
+            <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
+              {t("bioP4")}
+            </p>
+          </Reveal>
         </div>
       </section>
 
-      {/* 3. Tres principios (texto puro, sin grid ni iconos) ───────────── */}
-      <section
-        className="px-6 pb-24 md:pb-32"
-        aria-labelledby="principles-heading"
-      >
+      {/* 3. Tres principios — pilares editoriales ───────────────────────── */}
+      {/* Numerados, título en .t-h3, separados por hairline y con aire, para que
+          se lean como pilares y no como lista. Sin cajas ni iconos (PRINCIPLES).
+          El índice (01/02/03) va en muted (≥7:1 en ambos temas; el acento no lo
+          alcanzaría). Cada pilar entra al scroll con una cascada leve. */}
+      <section className="px-6 pb-24 md:pb-32" aria-labelledby="principles-heading">
         <div className="mx-auto max-w-prose">
+          <Reveal>
+            <p className="mb-8 text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)] md:mb-10">
+              Cómo trabajamos
+            </p>
+          </Reveal>
           <h2 id="principles-heading" className="sr-only">
             Principios del estudio
           </h2>
-          <ol className="space-y-12" role="list">
+          <ol className="flex flex-col" role="list">
             {([1, 2, 3] as const).map((n) => (
-              <li key={n}>
-                <h3 className="font-display text-2xl font-bold leading-tight text-[var(--text)]">
-                  {t(`principle${n}Title` as const)}
-                </h3>
-                <p className="mt-2 text-base leading-relaxed text-[var(--text-muted)]">
+              <Reveal
+                as="li"
+                key={n}
+                y={16}
+                delay={(n - 1) * 0.08}
+                className={
+                  n === 1
+                    ? "pt-0"
+                    : "mt-8 border-t border-[var(--border)] pt-8 md:mt-10 md:pt-10"
+                }
+              >
+                <div className="flex items-baseline gap-4 md:gap-5">
+                  <span
+                    aria-hidden
+                    className="font-display text-base font-semibold tabular-nums text-[var(--text-muted)]"
+                  >
+                    0{n}
+                  </span>
+                  <h3 className="t-h3 font-display font-bold text-[var(--text)]">
+                    {t(`principle${n}Title` as const)}
+                  </h3>
+                </div>
+                <p className="mt-3 text-base leading-relaxed text-[var(--text-muted)] md:pl-[2.6rem]">
                   {t(`principle${n}Body` as const)}
                 </p>
-              </li>
+              </Reveal>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* 3.5. El equipo — "character select" (dos personas). Interactivo. */}
+      {/* 3.5. El equipo — humanidad ─────────────────────────────────────── */}
+      {/* Composición editorial ASIMÉTRICA (no bloque centrado): eyebrow + h2 a
+          la izquierda, lead humano a la derecha; debajo, el "character select"
+          interactivo (dos personas reales). Entra al scroll.
+
+          Copy del lead: real y estructural (no inventa datos) — el detalle
+          humano por persona (rol + tagline) vive en <CharacterSelect>, marcado
+          `TODO(Leo)` para afinar. Si quieres una frase más personal a nivel de
+          sección, este <p> es el sitio para sustituirla. */}
       <section
         className="border-t border-[var(--border)] px-6 py-20 md:py-28"
         aria-labelledby="team-heading"
       >
-        <div className="mx-auto mb-10 max-w-prose text-center md:mb-14">
-          <p className="mb-3 text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
-            Sobre nosotros
-          </p>
-          <h2
-            id="team-heading"
-            className="font-display t-h2 font-bold text-[var(--text)]"
+        <div className="mx-auto max-w-5xl">
+          <Reveal
+            stagger
+            className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-end md:gap-14"
           >
-            El equipo
-          </h2>
-          <p className="mt-4 text-lg leading-relaxed text-[var(--text-muted)]">
-            Somos dos. Elige un personaje.
-          </p>
+            <div>
+              <p className="mb-3 text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
+                Quiénes estamos detrás
+              </p>
+              <h2
+                id="team-heading"
+                className="font-display t-h2 font-bold text-[var(--text)]"
+              >
+                El equipo
+              </h2>
+            </div>
+            <p className="text-pretty text-lg leading-relaxed text-[var(--text-muted)] md:text-xl">
+              Detrás de cada juego estamos solo dos personas: uno pone el código,
+              el otro el arte, y lo demás lo decidimos entre los dos.
+            </p>
+          </Reveal>
+
+          <Reveal className="mt-12 md:mt-16" y={16}>
+            <CharacterSelect />
+          </Reveal>
         </div>
-        <CharacterSelect />
       </section>
 
       {/* 4. Cierre — una línea + un único CTA hacia /contacto ──────────── */}
       <section className="px-6 pb-24 md:pb-32" aria-label="Contacto">
-        <div className="mx-auto flex max-w-prose flex-col items-center gap-7 text-center">
+        <Reveal
+          stagger
+          className="mx-auto flex max-w-prose flex-col items-center gap-7 text-center"
+        >
           <p className="text-lg italic text-[var(--text-muted)]">
             {t("closingLine")}
           </p>
           <Button asChild size="lg" variant="solid">
             <Link href={{ pathname: "/contacto" }}>{t("closingCta")}</Link>
           </Button>
-        </div>
+        </Reveal>
       </section>
     </>
   );
