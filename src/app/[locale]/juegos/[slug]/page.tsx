@@ -97,8 +97,15 @@ export default async function GameDetailPage({ params }: PageProps) {
         className="relative flex min-h-[100svh] items-end overflow-hidden"
         aria-labelledby="game-title"
       >
-        {/* Fallback de marca: violeta dominante, no accentColor del juego. */}
-        <GameImage src={game.keyArt} alt={game.title.es} initial={game.title.es.charAt(0)} />
+        {/* Fallback de marca: violeta dominante, no accentColor del juego.
+            `priority`: es la imagen fullbleed above-the-fold (el LCP visual) →
+            se carga eager, con el blur-up de marca mientras llega. */}
+        <GameImage
+          src={game.keyArt}
+          alt={game.title.es}
+          initial={game.title.es.charAt(0)}
+          priority
+        />
         {/* Degradado inferior para legibilidad */}
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-2/3"
@@ -180,10 +187,27 @@ export default async function GameDetailPage({ params }: PageProps) {
           <h2 id="description-heading" className="sr-only">
             {game.title.es} — descripción
           </h2>
-          <div className="space-y-6 text-lg leading-relaxed text-[var(--text-muted)]">
-            {paragraphs.map((p, i) => (
-              <p key={i}>{p}</p>
-            ))}
+          {/* El primer párrafo es un LEAD: un punto mayor y en color pleno
+              (--text) para que la lectura "empiece" con intención; el resto en
+              --text-muted. (Lead antes que capitular: más sobrio, doctrina.) */}
+          <div>
+            {paragraphs.map((p, i) =>
+              i === 0 ? (
+                <p
+                  key={i}
+                  className="text-pretty text-xl leading-relaxed text-[var(--text)] md:text-2xl"
+                >
+                  {p}
+                </p>
+              ) : (
+                <p
+                  key={i}
+                  className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]"
+                >
+                  {p}
+                </p>
+              ),
+            )}
           </div>
         </div>
       </section>
@@ -205,15 +229,22 @@ export default async function GameDetailPage({ params }: PageProps) {
         </section>
       )}
 
-      {/* 5. Info técnica — una fila simple */}
+      {/* 5. Ficha técnica — franja editorial (etiqueta + valor, en panel con
+          hairline de Fase 2). Escaneable, sobria: no una tabla recargada. */}
       <section className="px-6 pb-20" aria-labelledby="tech-heading">
-        <div className="mx-auto max-w-prose text-center">
+        <div className="mx-auto max-w-4xl">
           <h2 id="tech-heading" className="sr-only">
-            {game.title.es} — información
+            {game.title.es} — {t("moreInfo")}
           </h2>
-          <p className="text-sm text-[var(--text-muted)] md:text-base">
-            <TechRow game={game} statusLabel={statusLabel} />
-          </p>
+          <dl className="grid grid-cols-2 gap-x-8 gap-y-6 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)]/40 px-6 py-6 shadow-[var(--hairline)] sm:grid-cols-4 md:px-10 md:py-7">
+            <Spec label={t("year")} value={String(game.year)} />
+            <Spec label={t("genres")} value={game.genres.join(" · ")} />
+            <Spec
+              label={t("platforms")}
+              value={game.platforms.map((p) => PLATFORM_LABEL[p] ?? p).join(" · ")}
+            />
+            <Spec label={t("filterStatus")} value={statusLabel} />
+          </dl>
         </div>
       </section>
 
@@ -258,9 +289,9 @@ export default async function GameDetailPage({ params }: PageProps) {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-6">
           <Link
             href={{ pathname: "/juegos/[slug]", params: { slug: neighbors.prev.slug } }}
-            className="group inline-flex flex-1 items-center gap-3 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--text)] focus-visible:outline-none focus-visible:text-[var(--text)]"
+            className="group inline-flex flex-1 items-center gap-3 text-sm text-[var(--text-muted)] transition-colors duration-[var(--dur-base)] [transition-timing-function:var(--ease-standard)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:text-[var(--text)]"
           >
-            <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
+            <ArrowLeft className="size-4 transition-transform duration-[var(--dur-base)] [transition-timing-function:var(--ease-standard)] group-hover:-translate-x-1" />
             <span className="flex flex-col">
               <span className="text-xs uppercase tracking-widest text-[var(--text-subtle)]">
                 {t("prevGame")}
@@ -272,7 +303,7 @@ export default async function GameDetailPage({ params }: PageProps) {
           </Link>
           <Link
             href={{ pathname: "/juegos/[slug]", params: { slug: neighbors.next.slug } }}
-            className="group inline-flex flex-1 items-center justify-end gap-3 text-right text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--text)] focus-visible:outline-none focus-visible:text-[var(--text)]"
+            className="group inline-flex flex-1 items-center justify-end gap-3 text-right text-sm text-[var(--text-muted)] transition-colors duration-[var(--dur-base)] [transition-timing-function:var(--ease-standard)] hover:text-[var(--text)] focus-visible:outline-none focus-visible:text-[var(--text)]"
           >
             <span className="flex flex-col items-end">
               <span className="text-xs uppercase tracking-widest text-[var(--text-subtle)]">
@@ -282,7 +313,7 @@ export default async function GameDetailPage({ params }: PageProps) {
                 {neighbors.next.title.es}
               </span>
             </span>
-            <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="size-4 transition-transform duration-[var(--dur-base)] [transition-timing-function:var(--ease-standard)] group-hover:translate-x-1" />
           </Link>
         </div>
       </nav>
@@ -290,28 +321,17 @@ export default async function GameDetailPage({ params }: PageProps) {
   );
 }
 
-interface TechRowProps {
-  game: Game;
-  statusLabel: string;
-}
-
-function TechRow({ game, statusLabel }: TechRowProps) {
-  const platforms = game.platforms.map((p) => PLATFORM_LABEL[p] ?? p).join(", ");
-  const parts = [
-    String(game.year),
-    game.genres[0] ?? "",
-    platforms,
-    statusLabel,
-  ].filter(Boolean);
+/** Celda de la ficha técnica: etiqueta pequeña (muted, ≥7:1) + valor pleno. */
+function Spec({ label, value }: { label: string; value: string }) {
   return (
-    <span className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-      {parts.map((part, i) => (
-        <span key={i} className="inline-flex items-center gap-3">
-          {i > 0 && <span className="text-[var(--text-subtle)]" aria-hidden>·</span>}
-          <span>{part}</span>
-        </span>
-      ))}
-    </span>
+    <div className="flex flex-col gap-1.5">
+      <dt className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[var(--text-muted)]">
+        {label}
+      </dt>
+      <dd className="text-[15px] font-medium leading-snug text-[var(--text)]">
+        {value}
+      </dd>
+    </div>
   );
 }
 

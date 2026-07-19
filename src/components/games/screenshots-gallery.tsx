@@ -34,8 +34,12 @@ export function ScreenshotsGallery({ shots, gameTitle }: ScreenshotsGalleryProps
               className={cn(
                 "group relative block aspect-video w-full overflow-hidden rounded-[var(--radius-card)]",
                 "cursor-pointer border border-[var(--border)] bg-[var(--surface)]",
-                "transition-shadow duration-300 hover:shadow-[var(--shadow-card-hover)]",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",
+                // Elevación + estados de Fase 2, curva del sistema.
+                "shadow-[var(--shadow-card)]",
+                "transition-[transform,box-shadow,border-color] duration-[var(--dur-base)] [transition-timing-function:var(--ease-standard)]",
+                "hover:border-[var(--accent)]/30 hover:shadow-[var(--shadow-card-hover)]",
+                "motion-safe:active:scale-[0.99]",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-hover)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]",
               )}
               aria-label={`${gameTitle} — captura ${i + 1}`}
             >
@@ -43,6 +47,8 @@ export function ScreenshotsGallery({ shots, gameTitle }: ScreenshotsGalleryProps
                 src={src}
                 alt={`${gameTitle} — captura ${i + 1}`}
                 initial={String(i + 1)}
+                sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 92vw"
+                className="transition-transform duration-[var(--dur-slow)] [transition-timing-function:var(--ease-standard)] group-hover:scale-105"
               />
             </button>
           </li>
