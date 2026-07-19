@@ -123,7 +123,14 @@ export default async function StudioPage({ params }: PageProps) {
           <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
             {t("bioP2")}
           </p>
-          <blockquote className="my-10 border-l-2 border-[var(--accent)]/50 pl-6 text-balance font-display text-2xl leading-snug text-[var(--text)] md:my-12 md:text-3xl">
+          {/* Color de la barra por estilo inline: globals.css declara un
+              `* { border-color: var(--border) }` SIN capa, que gana a cualquier
+              utilidad `border-[color]` de @layer utilities. El inline sí lo
+              vence, así la barra sale en acento (no en el hairline por defecto). */}
+          <blockquote
+            className="my-10 border-l-2 pl-6 text-balance font-display text-2xl leading-snug text-[var(--text)] md:my-12 md:text-3xl"
+            style={{ borderColor: "color-mix(in oklab, var(--accent) 50%, transparent)" }}
+          >
             {t("manifestoPull")}
           </blockquote>
           <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">

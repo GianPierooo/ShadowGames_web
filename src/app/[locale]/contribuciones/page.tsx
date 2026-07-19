@@ -175,7 +175,12 @@ function PlayButton({ c }: { c: Contribution }) {
  */
 function Highlight({ text }: { text: string }) {
   return (
-    <p className="mt-8 border-l-2 border-[var(--accent)]/50 pl-5 leading-relaxed text-[var(--text)]">
+    // Color de la barra inline: ver nota en estudio/page.tsx (un `*` sin capa
+    // en globals.css gana a las utilidades border-[color]; el inline lo vence).
+    <p
+      className="mt-8 border-l-2 pl-5 leading-relaxed text-[var(--text)]"
+      style={{ borderColor: "color-mix(in oklab, var(--accent) 50%, transparent)" }}
+    >
       {text}
     </p>
   );
