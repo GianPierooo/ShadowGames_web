@@ -17,7 +17,10 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
         className={cn(
           "block h-12 w-full rounded-[var(--radius-input)] border border-[var(--border)] bg-[var(--surface)] px-4",
           "font-sans text-base text-[var(--text)] placeholder:text-[var(--text-subtle)]",
-          "transition-colors duration-150",
+          // Foco marca (Fase 2): borde + ring de acento que se funden con la
+          // curva y duración del sistema (antes transition-colors no animaba
+          // el ring, que es box-shadow).
+          "transition-[color,border-color,box-shadow,background-color] duration-[var(--dur-fast)] [transition-timing-function:var(--ease-standard)]",
           "focus-visible:outline-none focus-visible:border-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]/30",
           "aria-[invalid=true]:border-[var(--danger)] aria-[invalid=true]:focus-visible:ring-[var(--danger)]/30",
           "disabled:cursor-not-allowed disabled:opacity-60",

@@ -75,7 +75,14 @@ export default async function ContactPage({ params }: PageProps) {
           >
             {t("channelsHeading")}
           </h2>
-          <ul className="space-y-4 text-base" role="list">
+          {/* Ritmo editorial: cada canal es una fila con hairline (divide-y),
+              padding homogéneo aplicado a los <li> hijos (el email inline y los
+              <ChannelLink>). La columna se lee como panel compuesto, no lista
+              suelta. */}
+          <ul
+            className="divide-y divide-[var(--border)] border-t border-[var(--border)] text-base [&>li]:py-4 [&>li:first-child]:pt-5"
+            role="list"
+          >
             <li>
               <span className="block text-sm text-[var(--text-muted)]">
                 {t("channelEmail")}

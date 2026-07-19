@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { ExternalLink, Sparkles } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { CONTRIBUTIONS, type Contribution } from "@/lib/contributions";
 import { Button } from "@/components/ui/button";
 import { ScreenshotsGallery } from "@/components/games/screenshots-gallery";
@@ -80,7 +80,7 @@ function ContributionBlock({ c, t }: { c: Contribution; t: Translate }) {
         </p>
         <h2
           id={`contrib-${c.slug}`}
-          className="font-display text-3xl font-bold leading-tight tracking-tight text-[var(--text)] md:text-5xl"
+          className="t-h2 font-display font-bold text-[var(--text)]"
         >
           {c.title.es}
         </h2>
@@ -167,13 +167,17 @@ function PlayButton({ c }: { c: Contribution }) {
   );
 }
 
-/** Callout destacado (acento brasa) para notas como el lore oficial. */
+/**
+ * Nota destacada (p. ej. lore oficial). Sobria: barra de acento + texto pleno,
+ * sin icono decorativo ni caja tintada (PRINCIPLES: cero chrome, cero iconos
+ * decorativos). Mismo lenguaje que el pull-quote del manifiesto — la barra la
+ * distingue de la prosa muted que la rodea sin gritar.
+ */
 function Highlight({ text }: { text: string }) {
   return (
-    <div className="mt-8 flex items-start gap-3 rounded-[var(--radius-lg)] border border-[var(--color-ember)]/40 bg-[var(--color-ember)]/10 px-5 py-4">
-      <Sparkles className="mt-0.5 size-5 shrink-0 text-[var(--color-ember)]" aria-hidden />
-      <p className="font-medium text-[var(--text)]">{text}</p>
-    </div>
+    <p className="mt-8 border-l-2 border-[var(--accent)]/50 pl-5 leading-relaxed text-[var(--text)]">
+      {text}
+    </p>
   );
 }
 

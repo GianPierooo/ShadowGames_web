@@ -15,7 +15,9 @@ export const Textarea = forwardRef<
       className={cn(
         "block w-full rounded-[var(--radius-input)] border border-[var(--border)] bg-[var(--surface)] px-4 py-3",
         "font-sans text-base leading-relaxed text-[var(--text)] placeholder:text-[var(--text-subtle)]",
-        "resize-y transition-colors duration-150",
+        // Foco marca (Fase 2): mismo lenguaje que <Input> — ring de acento
+        // animado con la curva/duración del sistema.
+        "resize-y transition-[color,border-color,box-shadow,background-color] duration-[var(--dur-fast)] [transition-timing-function:var(--ease-standard)]",
         "focus-visible:outline-none focus-visible:border-[var(--accent)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]/30",
         "aria-[invalid=true]:border-[var(--danger)] aria-[invalid=true]:focus-visible:ring-[var(--danger)]/30",
         "disabled:cursor-not-allowed disabled:opacity-60",
