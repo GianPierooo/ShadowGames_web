@@ -71,13 +71,6 @@ export async function Hero() {
           <TrailerDialog />
         </div>
       </div>
-
-      {/* Pista de scroll: hairline vertical con una luz que desciende (sobria,
-          de marca) en vez del chevron rebotón. */}
-      <div
-        className="scroll-cue absolute bottom-8 left-1/2 z-10 -translate-x-1/2"
-        aria-hidden
-      />
     </section>
   );
 }

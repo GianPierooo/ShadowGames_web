@@ -7,27 +7,12 @@
  *  3. Viñeta radial para enfocar el centro (funde los bordes → oculta el HUD
  *     del gameplay en las esquinas).
  *  4. Grano (se aplica con la clase `grain` en la sección padre).
- *  5. Partículas violeta flotantes.
  *
  * Todo el movimiento se congela con prefers-reduced-motion (manejado en
  * globals.css y, para el video, dentro de HeroVideo).
  */
 
 import { HeroVideo } from "@/components/home/hero-video";
-
-// Posiciones deterministas (evitan mismatch de hidratación).
-const PARTICLES = [
-  { left: "12%", top: "28%", size: 6, dur: "7s", delay: "0s" },
-  { left: "22%", top: "62%", size: 4, dur: "9s", delay: "1.2s" },
-  { left: "35%", top: "18%", size: 5, dur: "8s", delay: "0.6s" },
-  { left: "48%", top: "72%", size: 3, dur: "10s", delay: "2s" },
-  { left: "58%", top: "32%", size: 7, dur: "7.5s", delay: "0.3s" },
-  { left: "68%", top: "58%", size: 4, dur: "9.5s", delay: "1.6s" },
-  { left: "78%", top: "24%", size: 5, dur: "8.5s", delay: "0.9s" },
-  { left: "86%", top: "66%", size: 6, dur: "7s", delay: "2.4s" },
-  { left: "16%", top: "44%", size: 3, dur: "11s", delay: "1s" },
-  { left: "90%", top: "40%", size: 4, dur: "8s", delay: "0.4s" },
-] as const;
 
 export function HeroBackdrop() {
   return (
@@ -89,24 +74,6 @@ export function HeroBackdrop() {
             "radial-gradient(ellipse at center, transparent 35%, var(--bg) 100%)",
         }}
       />
-
-      {/* 5. Partículas */}
-      {PARTICLES.map((p, i) => (
-        <span
-          key={i}
-          className="particle"
-          style={
-            {
-              left: p.left,
-              top: p.top,
-              width: p.size,
-              height: p.size,
-              "--p-dur": p.dur,
-              "--p-delay": p.delay,
-            } as React.CSSProperties
-          }
-        />
-      ))}
     </div>
   );
 }
