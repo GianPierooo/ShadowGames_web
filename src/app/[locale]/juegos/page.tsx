@@ -116,13 +116,36 @@ export default async function GamesIndexPage({ params, searchParams }: PageProps
           {filtered.length === 0 ? (
             <EmptyState />
           ) : (
-            <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filtered.map((game, i) => (
-                <Reveal as="li" key={game.slug} delay={(i % 4) * 0.05}>
-                  <GameCard game={game} statusLabel={statusLabels[game.status]} />
-                </Reveal>
-              ))}
-            </ul>
+            (() => {
+              // Composición editorial: el primero (featured por el sort) va como
+              // BANNER apaisado a todo el ancho; el resto, en una rejilla de
+              // tiles. El banner NO se envuelve en Reveal: puede ser el LCP de la
+              // página, así que se pinta de inmediato (sin gatearlo tras JS).
+              // Estamos en la rama `filtered.length > 0`, así que [0] existe.
+              const featured = filtered[0]!;
+              const rest = filtered.slice(1);
+              return (
+                <div className="flex flex-col gap-5 md:gap-6">
+                  <GameCard
+                    game={featured}
+                    statusLabel={statusLabels[featured.status]}
+                    variant="banner"
+                  />
+                  {rest.length > 0 && (
+                    <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                      {rest.map((game, i) => (
+                        <Reveal as="li" key={game.slug} delay={(i % 2) * 0.06}>
+                          <GameCard
+                            game={game}
+                            statusLabel={statusLabels[game.status]}
+                          />
+                        </Reveal>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })()
           )}
         </div>
       </section>

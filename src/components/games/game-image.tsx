@@ -15,6 +15,16 @@ import Image from "next/image";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 
+/**
+ * Placeholder de marca para el blur-up NATIVO de next/image: un gradiente
+ * violeta→tinta (8×10, 122 B). next/image lo pinta difuminado mientras la
+ * imagen real carga y hace el cross-fade solo — funciona SIN JS (no depende de
+ * onLoad/hidratación) y da un "fondo de color de marca" en vez de aparecer en
+ * seco. Genérico (no por juego): coherente con la penumbra.
+ */
+const BRAND_BLUR =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAKCAIAAAAGpYjXAAAAQUlEQVR4nGNQkDDDihjkxI2wIgYZUX2siEFKRBsrYpAQ1sCKGMQEVbAiBhEBRayIQYhfFitiEOCVwooY+HjEsCIAxS0YsVFH6jwAAAAASUVORK5CYII=";
+
 interface GameImageProps {
   /** Ruta del asset (`/games/<slug>/...`). Si no existe, se usa el fallback. */
   src: string;
@@ -27,6 +37,10 @@ interface GameImageProps {
   className?: string;
   /** Cuando true, oculta la inicial decorativa (útil en el hero, p.ej.). */
   hideInitial?: boolean;
+  /** Hint de tamaño responsive (evita sobre-descargar). Default: 100vw. */
+  sizes?: string;
+  /** Above-the-fold (p.ej. el banner destacado): carga con prioridad. */
+  priority?: boolean;
 }
 
 export function GameImage({
@@ -36,6 +50,8 @@ export function GameImage({
   initial,
   className,
   hideInitial = false,
+  sizes = "100vw",
+  priority = false,
 }: GameImageProps) {
   const [failed, setFailed] = useState(false);
 
@@ -45,7 +61,10 @@ export function GameImage({
         src={src}
         alt={alt}
         fill
-        sizes="100vw"
+        sizes={sizes}
+        priority={priority}
+        placeholder="blur"
+        blurDataURL={BRAND_BLUR}
         className={cn("object-cover", className)}
         onError={() => setFailed(true)}
       />
