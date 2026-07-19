@@ -20,12 +20,11 @@ export async function StudioSection() {
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-16">
         <Reveal>
           <div className="flex flex-col gap-6">
-            <p className="text-xs font-medium uppercase tracking-[0.3em] text-[var(--accent)]">
-              {t("studioEyebrow")}
-            </p>
+            {/* Sin eyebrow: el h2 ya dice "El estudio" (PRINCIPLES: eyebrow+h2
+                redundante = genérico). El h2 adopta .t-h2 (Fase 2) y lidera. */}
             <h2
               id="studio-heading"
-              className="font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl"
+              className="t-h2 font-display font-bold text-[var(--text)]"
             >
               {t("studioTitle")}
             </h2>

@@ -113,11 +113,25 @@ export default async function StudioPage({ params }: PageProps) {
           cliente pase la copia definitiva. Hasta entonces, placeholder
           coherente con "Mundos con sombra, hechos a mano". */}
       <section className="section-y px-6" aria-label="Manifiesto">
-        <div className="mx-auto max-w-prose space-y-6 text-lg leading-relaxed text-[var(--text-muted)]">
-          <p>{t("bioP1")}</p>
-          <p>{t("bioP2")}</p>
-          <p>{t("bioP3")}</p>
-          <p>{t("bioP4")}</p>
+        <div className="mx-auto max-w-prose">
+          {/* Primer párrafo como LEAD (mayor, color pleno); el resto en muted.
+              Una cita extraída del manifiesto actúa de respiro visual — pull-quote
+              sobrio (barra de acento + display), sin comillas decorativas. */}
+          <p className="text-pretty text-xl leading-relaxed text-[var(--text)] md:text-2xl">
+            {t("bioP1")}
+          </p>
+          <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
+            {t("bioP2")}
+          </p>
+          <blockquote className="my-10 border-l-2 border-[var(--accent)]/50 pl-6 text-balance font-display text-2xl leading-snug text-[var(--text)] md:my-12 md:text-3xl">
+            {t("manifestoPull")}
+          </blockquote>
+          <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
+            {t("bioP3")}
+          </p>
+          <p className="mt-6 text-lg leading-relaxed text-[var(--text-muted)]">
+            {t("bioP4")}
+          </p>
         </div>
       </section>
 
