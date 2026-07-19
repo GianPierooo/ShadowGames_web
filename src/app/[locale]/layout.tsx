@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { ViewTransition } from "react";
 import { Fraunces, Inter_Tight } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
@@ -126,7 +127,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
               {t("skipToContent")}
             </a>
             <Header />
-            <main id="contenido">{children}</main>
+            {/* Transición de ruta nativa: el contenido hace crossfade sobrio
+                al navegar (el header queda anclado, ver globals.css). El primer
+                render no es una Transición → sin animación de entrada, LCP intacto. */}
+            <main id="contenido">
+              <ViewTransition>{children}</ViewTransition>
+            </main>
             <Footer />
           </Providers>
         </NextIntlClientProvider>

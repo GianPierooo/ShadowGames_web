@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ViewTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Menu } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -42,7 +42,11 @@ export function Header() {
     !scrolled && (pathname === "/" || pathname.startsWith("/juegos/"));
 
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 px-4 pt-4 md:pt-5">
+    <header
+      className="pointer-events-none fixed inset-x-0 top-0 z-40 px-4 pt-4 md:pt-5"
+      // Ancla espacial durante las transiciones de ruta (globals.css).
+      style={{ viewTransitionName: "site-header" }}
+    >
       <div
         data-theme={overDarkHero ? "dark" : undefined}
         className={cn(
@@ -57,10 +61,15 @@ export function Header() {
         {/* Marca */}
         <Link
           href="/"
-          className="shrink-0 rounded-[var(--radius-pill)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          className="group shrink-0 rounded-[var(--radius-pill)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           aria-label="Shadow Games — Inicio"
         >
-          <BrandMark size={32} className="text-[var(--text)]" />
+          {/* Micro-hover del logo: escala mínima con la curva del sistema,
+              gated por motion-safe (sin movimiento en reduced-motion). */}
+          <BrandMark
+            size={32}
+            className="text-[var(--text)] transition-transform duration-[var(--dur-base)] [transition-timing-function:var(--ease-out)] will-change-transform motion-safe:group-hover:scale-110"
+          />
         </Link>
 
         {/* Nav central — pills (desktop) */}
@@ -72,16 +81,28 @@ export function Header() {
                 key={item.key}
                 href={item.href}
                 className={cn(
-                  "rounded-[var(--radius-pill)] px-4 py-2 text-sm font-medium",
-                  "transition-colors duration-200",
+                  "relative rounded-[var(--radius-pill)] px-4 py-2 text-sm font-medium",
+                  "transition-colors duration-[var(--dur-base)] [transition-timing-function:var(--ease-standard)]",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
                   active
-                    ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+                    ? "text-[var(--accent)]"
                     : "text-[var(--text-muted)] hover:bg-[var(--accent-soft)] hover:text-[var(--text)]",
                 )}
                 aria-current={active ? "page" : undefined}
               >
-                {t(item.key)}
+                {/* El pill de acento es un shared element: al cambiar de ruta el
+                    navegador lo morfa de un item al siguiente (indicador que
+                    transiciona, no estático). Bajo reduced-motion aparece sin
+                    animar. Va detrás del texto (el texto es `relative`). */}
+                {active && (
+                  <ViewTransition name="nav-indicator">
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 rounded-[var(--radius-pill)] bg-[var(--accent-soft)]"
+                    />
+                  </ViewTransition>
+                )}
+                <span className="relative">{t(item.key)}</span>
               </Link>
             );
           })}

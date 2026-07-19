@@ -63,7 +63,26 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-[var(--border)] pt-6">
+        {/* Cierre: wordmark fantasma — remate editorial que convierte el pie
+            utilitario en un "momento", sin añadir chrome ni copy. Decorativo
+            (aria-hidden); color por color-mix para adaptarse al tema. El
+            overflow-hidden lo recorta al ancho sin provocar scroll horizontal. */}
+        <div
+          aria-hidden
+          className="pointer-events-none mt-14 select-none overflow-hidden"
+        >
+          <span
+            className="block whitespace-nowrap font-display font-bold leading-[0.8] tracking-tight"
+            style={{
+              fontSize: "clamp(3rem, 13vw, 9rem)",
+              color: "color-mix(in srgb, var(--text) 5%, transparent)",
+            }}
+          >
+            Shadow Games
+          </span>
+        </div>
+
+        <div className="mt-8 border-t border-[var(--border)] pt-6">
           <p className="text-xs text-[var(--text-subtle)]">
             © {year} Shadow Games Studio. {tf("rights")}.
           </p>

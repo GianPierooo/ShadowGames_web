@@ -346,6 +346,54 @@ a:focus-visible {
 }
 
 /* ===========================================================================
+ * View Transitions (Fase 7) — transiciones de ruta nativas + indicador de nav.
+ *
+ * Activadas por `experimental.viewTransition` (next.config). Las navegaciones
+ * de App Router son Transiciones de React: <ViewTransition> anima solo, sin
+ * librería ni JS de layout. En el primer paint NO hay transición (no degrada
+ * LCP); solo animan las navegaciones cliente posteriores.
+ * =========================================================================== */
+
+/* Crossfade de ruta sobrio: se ajusta la curva/duración del root al sistema. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--dur-base);
+  animation-timing-function: var(--ease-standard);
+}
+
+/* Indicador de nav (shared element): el pill de acento morfa de un item al
+   siguiente al cambiar de ruta, con la curva/duración del sistema. */
+::view-transition-group(nav-indicator) {
+  animation-duration: var(--dur-base);
+  animation-timing-function: var(--ease-standard);
+}
+
+/* Header anclado: es `position: fixed` y hace de ancla espacial — no debe
+   desplazarse ni parpadear mientras el contenido hace crossfade. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 50;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* Reduced motion: el bloque global de arriba (`*`) NO alcanza los
+   pseudo-elementos de view transition. Aquí se colapsan a swap instantáneo,
+   que es el comportamiento por defecto del navegador sin animación. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ===========================================================================
  * Entrada above-the-fold — animación CSS pura (NO Motion/JS).
  *
  * Clave de rendimiento (LCP): estas animaciones arrancan en el primer paint,
